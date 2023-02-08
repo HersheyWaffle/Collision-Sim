@@ -45,35 +45,46 @@ public class Cube extends Solide {
 		//Cree le plan
 		for(double y = -nbrPointsLargeur/2; y <= nbrPointsLargeur/2; y += ESPACE_ENTRE_POINTS) {
 			for(double z = -nbrPointsHauteur/2; z <= nbrPointsHauteur/2; z += ESPACE_ENTRE_POINTS) {
-				if(y == Math.abs(nbrPointsLargeur/2) || z == Math.abs(nbrPointsHauteur/2)) {
-					cote.add(new Vector3d(nbrPointsLongueur, y, z));
-				}
-				carre.add(new Vector3d(nbrPointsLongueur, y, z));
+				carre.add(new Vector3d(nbrPointsLongueur/2, y, z));
 			}
 		}
 	}
 	
 	
 	public void cube( ){															//FIXME	Ne semble pas fonctionner correctement
+
+//		cube.add(carre);
+		
 		ArrayList<Vector3d> perimetre = new ArrayList<Vector3d>();
 		ArrayList<Vector3d> coteOppose = new ArrayList<Vector3d>();
+		ArrayList<Vector3d> carreDernier = new ArrayList<Vector3d>();
 		Vector3d vRot = new Vector3d();
 		
-		for(double x = -nbrPointsLongueur/2; x <= nbrPointsLongueur/2; x += ESPACE_ENTRE_POINTS) {
-			for(Vector3d v : cote) {
+		for(double x = nbrPointsLongueur/2; x > -nbrPointsLongueur/2; x -= ESPACE_ENTRE_POINTS) {
+			ArrayList<Vector3d> carreSuivant = new ArrayList<Vector3d>();
+			
+			for(Vector3d v : carre) {
 				Vector3d u = new Vector3d(x, v.y, v.z);
-				perimetre.add(u);
+				if(v.y == nbrPointsLargeur/2 || v.z == nbrPointsHauteur/2 || v.y == -nbrPointsLargeur/2 || v.z == -nbrPointsHauteur/2) {
+					carreSuivant.add(u);
+				}
 			}
-			cube.add(perimetre);
+			cube.add(carreSuivant);
 		}
 		
-		//FIXME Ne marche pas??
-		rotation.rotZ(Math.PI/3);
-		for(Vector3d vec : carre) {
-			rotation.transform(vec, vRot);
-			coteOppose.add(vRot);
+		for(Vector3d v : carre) {
+			Vector3d u = new Vector3d(-v.x, v.y, v.z);
+			carreDernier.add(u);
 		}
-		cube.add(coteOppose);
+		cube.add(carreDernier);
+		
+		//FIXME Ne marche pas??
+//		rotation.rotZ(Math.PI);
+//		for(Vector3d vec : carre) {
+//			rotation.transform(vec, vRot);
+//			coteOppose.add(vRot);
+//		}
+//		cube.add(coteOppose);
 	}
 	
 	
