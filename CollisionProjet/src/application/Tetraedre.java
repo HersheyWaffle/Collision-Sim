@@ -1,5 +1,5 @@
 package application;
 
-public class Tetraedre extends Solide {
+public class Tetraedre {
 
 }
