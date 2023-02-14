@@ -29,12 +29,12 @@ public class Main extends Application {
 			primaryStage.setScene(scene);
 			primaryStage.show();
 
-			Sphere s = new Sphere(100);
+			Sphere s = new Sphere(50, 120);
 			Cube cube1 = new Cube(100, 100, 100);
 			Cylindre cylindre = new Cylindre(100, 200);
 			Cone cone = new Cone(200, 100);
 			
-			ArrayList<Vector3d> forme = cone.getCone();
+			ArrayList<Vector3d> forme = s.getSphere();
 
 			Solide.creeForme(forme, root);
 //			Solide.creeForme(cube1.getCube(), root);

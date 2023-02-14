@@ -7,7 +7,7 @@ import javax.vecmath.Vector3d;
 /**
  * Objet Cylindrique.
  * 
- * @version 1.0.0 2023-02-08
+ * @version 1.1.0 2023-02-14
  * @author Omar Ghazaly, Abel-Jimmy Oyono-Montoki
  */
 public class Cylindre {

@@ -4,6 +4,12 @@ import java.util.ArrayList;
 
 import javax.vecmath.Vector3d;
 
+/**
+ * Objet Conique.
+ * 
+ * @version 1.0.0 2023-02-14
+ * @author Omar Ghazaly, Abel-Jimmy Oyono-Montoki
+ */
 public class Cone {
 	final double ESPACE_ENTRE_POINTS = 8;
 	
