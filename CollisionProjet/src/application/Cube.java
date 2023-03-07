@@ -10,8 +10,8 @@ import javax.vecmath.Vector3d;
  * @version 1.1.0 2023-02-08
  * @author Omar Ghazaly, Abel-Jimmy Oyono-Montoki
  */
-public class Cube {
-	final double ESPACE_ENTRE_POINTS = 8;
+public class Cube extends Solide {
+	final double ESPACE_ENTRE_POINTS = 15;
 	
 	private double nbrPointsLongueur;									//nombre de points sur la longueur
 	private double nbrPointsLargeur;									//nombre de points sur la largeur
@@ -34,6 +34,8 @@ public class Cube {
 		setCarre();
 		setCube();
 		Solide.enleveDoublons(getCube());
+		
+		setSolide(cube);
 	}
 	
 	public ArrayList<Vector3d> getCube() {
@@ -70,21 +72,20 @@ public class Cube {
 	
 	public void setCarre() {
 		//Cree le plan
-		for(double y = -nbrPointsLargeur/2; y <= nbrPointsLargeur/2; y += ESPACE_ENTRE_POINTS) {
-			for(double z = -nbrPointsHauteur/2; z <= nbrPointsHauteur/2; z += ESPACE_ENTRE_POINTS) {
+		for(double y = -nbrPointsLargeur; y <= nbrPointsLargeur; y += ESPACE_ENTRE_POINTS) {
+			for(double z = -nbrPointsHauteur; z <= nbrPointsHauteur; z += ESPACE_ENTRE_POINTS) {
 				carre.add(new Vector3d(nbrPointsLongueur/2, y, z));
 			}
 		}
 	}
 	
-	
 	public void setCube( ){
-		for(double x = nbrPointsLongueur/2; x >= -nbrPointsLongueur/2; x -= ESPACE_ENTRE_POINTS) {
+		for(double x = nbrPointsLongueur; x >= -nbrPointsLongueur; x -= ESPACE_ENTRE_POINTS) {
 			ArrayList<Vector3d> carreSuivant = new ArrayList<Vector3d>();
 			
 			for(Vector3d v : carre) {
 				Vector3d u = new Vector3d(x, v.y, v.z);
-				if(v.y >= nbrPointsLargeur/2 - ESPACE_ENTRE_POINTS || v.z >= nbrPointsHauteur/2 - ESPACE_ENTRE_POINTS || v.y <= -nbrPointsLargeur/2 + ESPACE_ENTRE_POINTS || v.z <= -nbrPointsHauteur/2 + ESPACE_ENTRE_POINTS || x <= -nbrPointsLongueur/2 + ESPACE_ENTRE_POINTS || x >= nbrPointsLongueur/2 - ESPACE_ENTRE_POINTS) {
+				if(v.y >= nbrPointsLargeur - ESPACE_ENTRE_POINTS || v.z >= nbrPointsHauteur - ESPACE_ENTRE_POINTS || v.y <= -nbrPointsLargeur + ESPACE_ENTRE_POINTS || v.z <= -nbrPointsHauteur + ESPACE_ENTRE_POINTS || x <= -nbrPointsLongueur + ESPACE_ENTRE_POINTS || x >= nbrPointsLongueur - ESPACE_ENTRE_POINTS) {
 					carreSuivant.add(u);
 				}
 			}

@@ -11,7 +11,7 @@ import javax.vecmath.Matrix3d;
  * @version 1.0.2 2023-02-14
  * @author Omar Ghazaly, Abel-Jimmy Oyono-Montoki
  */
-public class Sphere {
+public class Sphere extends Solide{
 	final double ESPACE_ENTRE_POINTS = 3;
 
 	private double rayon;				//Rayon du cercle
@@ -35,6 +35,8 @@ public class Sphere {
 		setCercle();
 		Solide.setFormeRotation(dThetaCercle, cercle, sphere);
 		Solide.enleveDoublons(getSphere());
+		
+		setSolide(sphere);
 	}
 	
 	/**
