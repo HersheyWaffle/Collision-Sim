@@ -12,14 +12,24 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 /**
- * Classe utilitaire avec des fonctions generiques pour traiter les objets.
+ * Classe utilitaire avec des fonctions génériques pour traiter les objets.
  * 
  * @version 1.2.0 2023-02-14
  * @author Omar Ghazaly, Abel-Jimmy Oyono-Montoki
  */
 public class Solide {
+	private	ArrayList<Vector3d> solide = new ArrayList<Vector3d>();
+	
+	public ArrayList<Vector3d> getSolide() {
+		return solide;
+	}
+	
+	public void setSolide(ArrayList<Vector3d> solide) {
+		this.solide = solide;
+	}
+	
 	/**
-	 * Enleve les points poses a la meme position.
+	 * Enlève les points posés à la même position.
 	 * 
 	 * @param solide - Le ArrayList des points du solide
 	 */
@@ -41,7 +51,7 @@ public class Solide {
 	}
 	
 	/**
-	 * Effectue une rotation sur le cube. Les parametres sont en DEGRES
+	 * Effectue une rotation sur le solide. Les paramètres sont en DEGRÉS
 	 * 
 	 * @param solide - Le solide sur lequel on effectue la rotation
 	 * @param rotX - Rotation sur l'axe des X
@@ -49,7 +59,7 @@ public class Solide {
 	 * @param rotZ - Rotation sur l'axe des Z
 	 */
 	public static void rotateSolide(ArrayList<Vector3d> solide, double rotX, double rotY, double rotZ) {
-		Matrix3d rotation = new Matrix3d();			//Matrice 3D servant a effectuer la rotation des points et des plans
+		Matrix3d rotation = new Matrix3d();			//Matrice 3D servant à effectuer la rotation des points et des plans
 		
 		for(Vector3d v : solide) {
 			if(rotX != 0) {
@@ -68,14 +78,14 @@ public class Solide {
 	}
 	
 	/**
-	 * Genere les points d'un solide en effectuant une rotation sur un plan.
+	 * Génère les points d'un solide en effectuant une rotation sur un plan.
 	 * 
 	 * @param dThetaCercle - Angle en Rad entre chaque point dans le cercle
 	 * @param plan - La liste de tous les points du plan qui va former le solide.
 	 * @param solide - La liste de tous les points du solide.
 	 */
 	public static void setFormeRotation(double dThetaCercle, ArrayList<Vector3d> plan, ArrayList<Vector3d> solide){
-		Matrix3d rotation = new Matrix3d();		//Matrice 3D servant a effectuer la rotation des points et des cercles
+		Matrix3d rotation = new Matrix3d();		//Matrice 3D servant à effectuer la rotation des points et des cercles
 		Vector3d u = new Vector3d();
 		
 		double theta = 0;
@@ -94,22 +104,24 @@ public class Solide {
 	}
 	
 	/**
-	 * Ajoute des objets Circle au root selon la liste de points du solide.
+	 * Ajoute des objets Circle au pane selon la liste de points du solide.
 	 * 
 	 * @param solide - La liste de tous les points du solide.
-	 * @param root - Le pane sur lequel on appose les cercles.
+	 * @param pane - Le pane sur lequel on appose les cercles.
+	 * @param posX - La position initiale en X du solide.
+	 * @param posY - La position initiale en Y du solide.
 	 */
-	public static void creeForme(ArrayList<Vector3d> solide, Pane root) {
+	public static void creeForme(ArrayList<Vector3d> solide, Pane pane, double posX, double posY) {
 		for (Vector3d v : solide) {
 			Circle cercle = new Circle(1);
-			cercle.setLayoutX(v.x + 200);
-			cercle.setLayoutY(v.y + 200);
+			cercle.setLayoutX(v.x + posX);
+			cercle.setLayoutY(v.y + posY);
 			if(v.z<0) {
 				cercle.setFill(Color.RED);
 				cercle.setRadius(3);
 			}
 			
-			root.getChildren().add(cercle);
+			pane.getChildren().add(cercle);
 		}
 	}
 }

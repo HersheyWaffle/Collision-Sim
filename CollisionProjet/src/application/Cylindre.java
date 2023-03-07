@@ -10,7 +10,7 @@ import javax.vecmath.Vector3d;
  * @version 1.1.0 2023-02-14
  * @author Omar Ghazaly, Abel-Jimmy Oyono-Montoki
  */
-public class Cylindre {
+public class Cylindre extends Solide {
 	final double ESPACE_ENTRE_POINTS = 8;
 	
 	private double rayon;				//Rayon du cercle
@@ -33,6 +33,8 @@ public class Cylindre {
 		setCarre();
 		Solide.setFormeRotation(dThetaCercle, carre, cylindre);
 		Solide.enleveDoublons(getCylindre());
+
+		setSolide(cylindre);
 	}
 	
 	public ArrayList<Vector3d> getCylindre() {
@@ -67,24 +69,4 @@ public class Cylindre {
 			}
 		}
 	}
-	
-	
-//	public void setCylindre( ){
-//		Matrix3d rotation = new Matrix3d();		//Matrice 3D servant a effectuer la rotation des points et des cercles
-//		Vector3d u = new Vector3d();
-//		
-//		double theta = 0;
-//		do {
-//			rotation.rotY(theta);
-//			ArrayList<Vector3d> anneau = new ArrayList<Vector3d>();
-//			for (Vector3d v : carre) {
-//				rotation.transform(v, u);
-//				anneau.add((Vector3d) u.clone());
-//			}
-//			
-//			cylindre.addAll(anneau);
-//
-//			theta += dThetaCercle;
-//		} while (theta < 2 * Math.PI);
-//	}
 }
