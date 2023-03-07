@@ -112,7 +112,7 @@
       </HBox>
    </center>
    <bottom>
-      <Button mnemonicParsing="false" onAction="#creeSphere" prefWidth="80.0" text="OK" BorderPane.alignment="CENTER">
+      <Button mnemonicParsing="false" onAction="#creeSolide" prefWidth="80.0" text="OK" BorderPane.alignment="CENTER">
          <BorderPane.margin>
             <Insets bottom="20.0" top="20.0" />
          </BorderPane.margin>
