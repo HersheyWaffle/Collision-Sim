@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ContextMenu?>
+<?import javafx.scene.control.MenuItem?>
+
+<ContextMenu fx:id="ctxtMenu" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+  <items>
+    <MenuItem fx:id="ctxtMenuEdit" mnemonicParsing="false" text="Éditer" />
+      <MenuItem fx:id="ctxtMenuDelete" mnemonicParsing="false" text="Supprimer" />
+  </items>
+</ContextMenu>
