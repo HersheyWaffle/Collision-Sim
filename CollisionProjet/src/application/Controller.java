@@ -112,6 +112,7 @@ public class Controller {
 	 * @param arg0 - L'argument du ActionEvent, dans ce cas c'est le bouton
 	 *             Supprimer
 	 */
+	@SuppressWarnings("unchecked")
 	@FXML
 	protected void effaceTout(ActionEvent arg0) {
 
@@ -129,6 +130,7 @@ public class Controller {
 		lstView.setItems(Main.listeNoms);
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected void effaceSolide(ActionEvent arg0) {
 
 		panePane.getChildren().removeAll(panePane.getChildren());
@@ -271,6 +273,7 @@ public class Controller {
 	 * Crée un solide selon les paramètres séléctionnés dans la fenêtre de
 	 * paramètres et les ajoute à une liste.
 	 */
+	@SuppressWarnings("unchecked")
 	@FXML
 	protected void creeSolide() {
 		Pane pane = (Pane) Main.root.getChildren().get(0);
@@ -301,7 +304,8 @@ public class Controller {
 			lstView = (ListView<String>) ((VBox) Main.root.getRight()).getChildren().get(1);
 			lstView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 			lstView.setContextMenu(creeContextMenu());
-			System.out.println("d0one");
+			
+			if(Main.DEBUG_MODE) System.out.println("d0one");
 		}
 		
 		lstView.setItems(Main.listeNoms);
@@ -353,10 +357,8 @@ public class Controller {
 					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
 		}
 
-//============DEBUG================
-		System.out.println(txtLon.getText() + " " + txtLar.getText() + " " + txtHau.getText());
-		System.out.println(Main.listeSolides.size());
-//=================================
+		if(Main.DEBUG_MODE) System.out.println(txtLon.getText() + " " + txtLar.getText() + " " + txtHau.getText());
+		if(Main.DEBUG_MODE) System.out.println(Main.listeSolides.size());
 	}
 
 	/**
@@ -377,21 +379,20 @@ public class Controller {
 				ArrayList<Vector3d> tousPoints = new ArrayList<Vector3d>();
 				for (Solide s : Main.listeSolides) {
 					tousPoints.addAll(s.getSolide());
-					System.out.println(tousPoints.size());
+					if(Main.DEBUG_MODE) System.out.println(tousPoints.size());
 				}
 
 				if (arg0.getCode() == KeyCode.X) {
 					Solide.rotateSolide(tousPoints, posNeg, 0, 0, centreX, centreY, centreZ);
-					System.out.println("x");
-
+					if(Main.DEBUG_MODE) System.out.println("x");
 				}
 				else if (arg0.getCode() == KeyCode.C) {
 					Solide.rotateSolide(tousPoints, 0, posNeg, 0, centreX, centreY, centreZ);
-					System.out.println("y");
+					if(Main.DEBUG_MODE) System.out.println("y");
 				}
 				else if (arg0.getCode() == KeyCode.Z) {
 					Solide.rotateSolide(tousPoints, 0, 0, posNeg, centreX, centreY, centreZ);
-					System.out.println("z");
+					if(Main.DEBUG_MODE) System.out.println("z");
 				}
 				else {
 					return;

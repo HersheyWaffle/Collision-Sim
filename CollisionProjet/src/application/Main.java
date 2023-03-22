@@ -19,6 +19,8 @@ import javafx.scene.layout.BorderPane;
  * @author Omar Ghazaly, Abel-Jimmy Oyono-Montoki
  */
 public class Main extends Application {
+	public static final boolean DEBUG_MODE = true;
+	
 	public static BorderPane root;
 	public static ObservableList<Solide> listeSolides = FXCollections.observableArrayList();
 	public static ObservableList<String> listeNoms = FXCollections.observableArrayList();
