@@ -14,13 +14,16 @@ import javafx.scene.shape.Circle;
 /**
  * Classe utilitaire avec des fonctions génériques pour traiter les objets.
  * 
- * @version 1.2.0 2023-02-14
+ * @version 1.4.0 2023-03-08
  * @author Omar Ghazaly, Abel-Jimmy Oyono-Montoki
  */
 public class Solide {
+
+//=========================VARIABLES=========================	
+
 	private ArrayList<Vector3d> solide = new ArrayList<Vector3d>();
-	private double posX = 0;
-	private double posY = 0;
+
+//=========================METHODES=========================	
 
 	public ArrayList<Vector3d> getSolide() {
 		return solide;
@@ -28,22 +31,6 @@ public class Solide {
 
 	public void setSolide(ArrayList<Vector3d> solide) {
 		this.solide = solide;
-	}
-
-	public double getPosY() {
-		return posY;
-	}
-
-	public void setPosY(double posY) {
-		this.posY = posY;
-	}
-
-	public double getPosX() {
-		return posX;
-	}
-
-	public void setPosX(double posX) {
-		this.posX = posX;
 	}
 
 	/**
@@ -76,41 +63,40 @@ public class Solide {
 	 * @param rotY   - Rotation sur l'axe des Y
 	 * @param rotZ   - Rotation sur l'axe des Z
 	 */
-	public static void rotateSolide(ArrayList<Vector3d> solide, double rotX, double rotY, double rotZ, double posX, double posY) {
+	public static void rotateSolide(ArrayList<Vector3d> solide, double rotX, double rotY, double rotZ, double posX,
+			double posY, double posZ) {
 		Matrix3d rotation = new Matrix3d(); // Matrice 3D servant à effectuer la rotation des points et des plans
-		double x = 0;
-		double y = 0;
 
 		for (Vector3d v : solide) {
 			if (rotX != 0) {
-				x = v.x;
 				v.x = v.x - posX;
-				y = v.y;
 				v.y = v.y - posY;
+				v.z = v.z - posZ;
 				rotation.rotX(rotX * Math.PI / 180);
 				rotation.transform(v);
-				v.x = x;
-				v.y = y;
+				v.x = v.x + posX;
+				v.y = v.y + posY;
+				v.z = v.z + posZ;
 			}
 			if (rotY != 0) {
-				x = v.x;
 				v.x = v.x - posX;
-				y = v.y;
 				v.y = v.y - posY;
+				v.z = v.z - posZ;
 				rotation.rotY(rotY * Math.PI / 180);
 				rotation.transform(v);
-				v.x = x;
-				v.y = y;
+				v.x = v.x + posX;
+				v.y = v.y + posY;
+				v.z = v.z + posZ;
 			}
 			if (rotZ != 0) {
-				x = v.x;
 				v.x = v.x - posX;
-				y = v.y;
 				v.y = v.y - posY;
+				v.z = v.z - posZ;
 				rotation.rotZ(rotZ * Math.PI / 180);
 				rotation.transform(v);
-				v.x = x;
-				v.y = y;
+				v.x = v.x + posX;
+				v.y = v.y + posY;
+				v.z = v.z + posZ;
 			}
 		}
 	}
@@ -149,12 +135,14 @@ public class Solide {
 	 * @param pane   - Le pane sur lequel on appose les cercles.
 	 * @param posX   - La position initiale en X du solide.
 	 * @param posY   - La position initiale en Y du solide.
+	 * @param posZ   - La position initiale en Z du solide.
 	 */
-	public static void creeForme(ArrayList<Vector3d> solide, Pane pane, double posX, double posY) {
+	public static void creeForme(ArrayList<Vector3d> solide, Pane pane, double posX, double posY, double posZ) {
 		for (Vector3d v : solide) {
 			Circle cercle = new Circle(1);
 			v.x = v.x + posX;
 			v.y = v.y + posY;
+			v.z = v.z + posZ;
 			cercle.setLayoutX(v.x);
 			cercle.setLayoutY(v.y);
 			if (v.z < 0) {

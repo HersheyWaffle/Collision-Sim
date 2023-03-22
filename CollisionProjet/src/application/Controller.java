@@ -17,8 +17,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
@@ -30,10 +33,27 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+/**
+ * Classe utilitaire qui gère les controlles de l'interface d'utilisation.
+ * 
+ * @version 1.3.0 2023-03-08
+ * @author Omar Ghazaly
+ */
 public class Controller {
 //=========================VARIABLES=========================
 
 	private Stage stage = new Stage();
+	private ListView<String> lstView;
+	
+	//TODO Set contextMenu, moveable obj, resize, delete
+	
+	private double centreX = 300;
+	private double centreY = 300;
+	private double centreZ =   0;
+
+	private MenuItem ctxtMenuItemEdit = new MenuItem("Éditer");
+	private MenuItem ctxtMenuItemDelete = new MenuItem("Supprimer");
+	private ContextMenu ctxtMenuListObj = new ContextMenu();
 	
 	@FXML
 	Pane panePane; // Le panneau Pane dans lequel se trouvent les solides
@@ -62,6 +82,30 @@ public class Controller {
 
 //=========================METHODES=========================
 
+	public double getCentreX() {
+		return centreX;
+	}
+
+	public void setCentreX(double centreX) {
+		this.centreX = centreX;
+	}
+
+	public double getCentreY() {
+		return centreY;
+	}
+
+	public void setCentreY(double centreY) {
+		this.centreY = centreY;
+	}
+
+	public double getCentreZ() {
+		return centreZ;
+	}
+
+	public void setCentreZ(double centreZ) {
+		this.centreZ = centreZ;
+	}
+
 	/**
 	 * Efface tous les objets dans la scène.
 	 * 
@@ -70,13 +114,34 @@ public class Controller {
 	 */
 	@FXML
 	protected void effaceTout(ActionEvent arg0) {
-		@SuppressWarnings("unchecked")
-		ListView<String> lstView = (ListView<String>) ((VBox) Main.getRoot().getRight()).getChildren().get(1);
 
 		panePane.getChildren().removeAll(panePane.getChildren());
 		Main.listeNoms.removeAll(Main.listeNoms);
 		Main.listeSolides.removeAll(Main.listeSolides);
 		Main.mapSolideNom.clear();
+		
+		if (lstView == null) {
+			lstView = (ListView<String>) ((VBox) Main.root.getRight()).getChildren().get(1);
+			lstView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+			lstView.setContextMenu(creeContextMenu());
+		}
+		
+		lstView.setItems(Main.listeNoms);
+	}
+	
+	protected void effaceSolide(ActionEvent arg0) {
+
+		panePane.getChildren().removeAll(panePane.getChildren());
+		Main.listeNoms.removeAll(Main.listeNoms);
+		Main.listeSolides.removeAll(Main.listeSolides);
+		Main.mapSolideNom.clear();
+		
+		if (lstView == null) {
+			lstView = (ListView<String>) ((VBox) Main.root.getRight()).getChildren().get(1);
+			lstView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+			lstView.setContextMenu(creeContextMenu());
+		}
+		
 		lstView.setItems(Main.listeNoms);
 	}
 
@@ -208,31 +273,45 @@ public class Controller {
 	 */
 	@FXML
 	protected void creeSolide() {
-		Pane pane = (Pane) Main.getRoot().getChildren().get(0);
-		@SuppressWarnings("unchecked")
-		ListView<String> lstView = (ListView<String>) ((VBox) Main.getRoot().getRight()).getChildren().get(1);
+		Pane pane = (Pane) Main.root.getChildren().get(0);
 
 		// Ne fait rien s'il y a des paramètres fautifs
+		if (txtLon.getText().toCharArray().length == 0) return;
 		for (char c : txtLon.getText().toCharArray()) {
 			if (!Character.isDigit(c) && c != '.') return;
 		}
+		if (txtLar.getText().toCharArray().length == 0) return;
 		for (char c : txtLar.getText().toCharArray()) {
 			if (!Character.isDigit(c) && c != '.') return;
 		}
+		if (txtX.getText().toCharArray().length == 0) return;
 		for (char c : txtX.getText().toCharArray()) {
 			if (!Character.isDigit(c) && c != '.' && c != '-') return;
 		}
+		if (txtY.getText().toCharArray().length == 0) return;
 		for (char c : txtY.getText().toCharArray()) {
 			if (!Character.isDigit(c) && c != '.' && c != '-') return;
 		}
-
-		lstView.setItems(Main.listeNoms);
+		if (txtZ.getText().toCharArray().length == 0) return;
+		for (char c : txtZ.getText().toCharArray()) {
+			if (!Character.isDigit(c) && c != '.' && c != '-') return;
+		}
 		
+		if (lstView == null) {
+			lstView = (ListView<String>) ((VBox) Main.root.getRight()).getChildren().get(1);
+			lstView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+			lstView.setContextMenu(creeContextMenu());
+			System.out.println("d0one");
+		}
+		
+		lstView.setItems(Main.listeNoms);
+
 		if (txtTitreParam.getText().toLowerCase().contains("cube")) {
+			if (txtHau.getText().toCharArray().length == 0) return;
 			for (char c : txtHau.getText().toCharArray()) {
 				if (!Character.isDigit(c) && c != '.') return;
 			}
-			
+
 			Cube cube = new Cube(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()),
 					Double.valueOf(txtHau.getText()));
 
@@ -240,7 +319,8 @@ public class Controller {
 			Main.listeNoms.add(txtNom.getText());
 			Main.mapSolideNom.put(txtNom.getText(), cube);
 
-			Solide.creeForme(cube.getCube(), pane, Double.valueOf(txtX.getText()) + 300, Double.valueOf(txtY.getText()) + 300);
+			Solide.creeForme(cube.getCube(), pane, Double.valueOf(txtX.getText()) + 300,
+					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
 		}
 		else if (txtTitreParam.getText().toLowerCase().contains("sphère")) {
 			Sphere sphere = new Sphere(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()));
@@ -249,7 +329,8 @@ public class Controller {
 			Main.listeNoms.add(txtNom.getText());
 			Main.mapSolideNom.put(txtNom.getText(), sphere);
 
-			Solide.creeForme(sphere.getSphere(), pane, Double.valueOf(txtX.getText()) + 300, Double.valueOf(txtY.getText()) + 300);
+			Solide.creeForme(sphere.getSphere(), pane, Double.valueOf(txtX.getText()) + 300,
+					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
 		}
 		else if (txtTitreParam.getText().toLowerCase().contains("cône")) {
 			Cone cone = new Cone(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()));
@@ -258,7 +339,8 @@ public class Controller {
 			Main.listeNoms.add(txtNom.getText());
 			Main.mapSolideNom.put(txtNom.getText(), cone);
 
-			Solide.creeForme(cone.getCone(), pane, Double.valueOf(txtX.getText()) + 300, Double.valueOf(txtY.getText()) + 300);
+			Solide.creeForme(cone.getCone(), pane, Double.valueOf(txtX.getText()) + 300,
+					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
 		}
 		else if (txtTitreParam.getText().toLowerCase().contains("cylindre")) {
 			Cylindre cylindre = new Cylindre(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()));
@@ -267,18 +349,19 @@ public class Controller {
 			Main.listeNoms.add(txtNom.getText());
 			Main.mapSolideNom.put(txtNom.getText(), cylindre);
 
-			Solide.creeForme(cylindre.getCylindre(), pane, Double.valueOf(txtX.getText()) + 300, Double.valueOf(txtY.getText()) + 300);
+			Solide.creeForme(cylindre.getCylindre(), pane, Double.valueOf(txtX.getText()) + 300,
+					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
 		}
 
 //============DEBUG================
 		System.out.println(txtLon.getText() + " " + txtLar.getText() + " " + txtHau.getText());
-//=================================
-
 		System.out.println(Main.listeSolides.size());
+//=================================
 	}
 
 	/**
-	 * Le Event Handler qui va gérérer les touches de clavier pour effectuer la rotation des solides dans l'éditeur.
+	 * Le Event Handler qui va gérérer les touches de clavier pour effectuer la
+	 * rotation des solides dans l'éditeur.
 	 * 
 	 * @return Retourne le KeyEvent de la rotation
 	 */
@@ -289,7 +372,7 @@ public class Controller {
 			@Override
 			public void handle(KeyEvent arg0) {
 				double posNeg = arg0.isShiftDown() ? -15 : 15;
-				Pane pane = (Pane) Main.getRoot().getChildren().get(0);
+				Pane pane = (Pane) Main.root.getChildren().get(0);
 
 				ArrayList<Vector3d> tousPoints = new ArrayList<Vector3d>();
 				for (Solide s : Main.listeSolides) {
@@ -298,25 +381,52 @@ public class Controller {
 				}
 
 				if (arg0.getCode() == KeyCode.X) {
-					Solide.rotateSolide(tousPoints, posNeg, 0, 0, 200, 200);
+					Solide.rotateSolide(tousPoints, posNeg, 0, 0, centreX, centreY, centreZ);
 					System.out.println("x");
 
 				}
 				else if (arg0.getCode() == KeyCode.C) {
-					Solide.rotateSolide(tousPoints, 0, posNeg, 0, 200, 200);
+					Solide.rotateSolide(tousPoints, 0, posNeg, 0, centreX, centreY, centreZ);
 					System.out.println("y");
 				}
 				else if (arg0.getCode() == KeyCode.Z) {
-					Solide.rotateSolide(tousPoints, 0, 0, posNeg, 200, 200);
+					Solide.rotateSolide(tousPoints, 0, 0, posNeg, centreX, centreY, centreZ);
 					System.out.println("z");
 				}
 				else {
 					return;
 				}
 				pane.getChildren().removeAll(pane.getChildren());
-				Solide.creeForme(tousPoints, pane, 0,0);
+				Solide.creeForme(tousPoints, pane, 0, 0, 0);
 			}
 		};
+	}
+	
+	protected ContextMenu creeContextMenu() {
+		ctxtMenuListObj.getItems().addAll(ctxtMenuItemEdit, ctxtMenuItemDelete);
+		
+		ctxtMenuItemDelete.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent e) {
+				for(String s : lstView.getSelectionModel().getSelectedItems()) {
+					for(Vector3d v : Main.mapSolideNom.get(s).getSolide()) {
+						//
+					}
+					((Pane) Main.root.getCenter()).getChildren().remove(lstView.getSelectionModel().getSelectedIndex());
+					Main.listeSolides.remove(Main.mapSolideNom.get(s));
+					Main.listeNoms.remove(s);
+					Main.mapSolideNom.remove(s);
+					lstView.setItems(Main.listeNoms);
+					
+					
+				}
+				
+			}
+			
+		});
+		
+		return ctxtMenuListObj;
 	}
 
 	/**
