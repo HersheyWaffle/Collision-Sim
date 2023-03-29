@@ -19,9 +19,9 @@ public class Cube extends Solide {
 	private double nbrPointsLongueur; // nombre de points sur la longueur
 	private double nbrPointsLargeur; // nombre de points sur la largeur
 	private double nbrPointsHauteur; // nombre de points sur la hauteur
-	private ArrayList<Vector3d> carre = new ArrayList<Vector3d>(); // Liste des vecteurs 3D de chaque point dans le
-																	// carre
-	private ArrayList<Vector3d> cube = new ArrayList<Vector3d>(); // Liste des vecteurs 3D de chaque point dans le cube
+	private ArrayList<Point> carre = new ArrayList<Point>(); // Liste des vecteurs 3D de chaque point dans le
+																// carre
+	private ArrayList<Point> cube = new ArrayList<Point>(); // Liste des vecteurs 3D de chaque point dans le cube
 
 //=========================CONSTRUCTEUR=======================	
 
@@ -31,8 +31,9 @@ public class Cube extends Solide {
 	 * @param longueur - La longueur du cube.
 	 * @param largeur  - La largeur du cube.
 	 * @param hauteur  - La hauteur du cube.
+	 * @param FONT_SIZE - taille des caractères
 	 */
-	public Cube(double longueur, double largeur, double hauteur) {
+	public Cube(double longueur, double largeur, double hauteur, final int FONT_SIZE) {
 		nbrPointsLongueur = longueur;
 		nbrPointsLargeur = largeur;
 		nbrPointsHauteur = hauteur;
@@ -41,16 +42,19 @@ public class Cube extends Solide {
 		setCube();
 		Solide.enleveDoublons(getCube());
 
+		quadrant();
+		clean();
+		render(FONT_SIZE);
 		setSolide(cube);
 	}
 
 //=========================METHODES=========================	
 
-	public ArrayList<Vector3d> getCube() {
+	public ArrayList<Point> getCube() {
 		return cube;
 	}
 
-	public ArrayList<Vector3d> getCarre() {
+	public ArrayList<Point> getCarre() {
 		return carre;
 	}
 
@@ -82,26 +86,30 @@ public class Cube extends Solide {
 		// Cree le plan
 		for (double y = -nbrPointsLargeur; y <= nbrPointsLargeur; y += ESPACE_ENTRE_POINTS) {
 			for (double z = -nbrPointsHauteur; z <= nbrPointsHauteur; z += ESPACE_ENTRE_POINTS) {
-				carre.add(new Vector3d(nbrPointsLongueur / 2, y, z));
+				Vector3d temp = new Vector3d(0, 0, 0);
+				temp.normalize(new Vector3d(nbrPointsLongueur / 2, y, z)); // SUS C'est ça la norme?
+				carre.add(new Point(new Vector3d(nbrPointsLongueur / 2, y, z), temp));
 			}
 		}
 	}
 
 	public void setCube() {
 		for (double x = nbrPointsLongueur; x >= -nbrPointsLongueur; x -= ESPACE_ENTRE_POINTS) {
-			ArrayList<Vector3d> carreSuivant = new ArrayList<Vector3d>();
-
-			for (Vector3d v : carre) {
-				Vector3d u = new Vector3d(x, v.y, v.z);
-				if (v.y >= nbrPointsLargeur - ESPACE_ENTRE_POINTS || v.z >= nbrPointsHauteur - ESPACE_ENTRE_POINTS
-						|| v.y <= -nbrPointsLargeur + ESPACE_ENTRE_POINTS
-						|| v.z <= -nbrPointsHauteur + ESPACE_ENTRE_POINTS
+			for (Point v : carre) {
+				Vector3d u = new Vector3d(x, v.getCoordonnee().y, v.getCoordonnee().z);
+				if (v.getCoordonnee().y >= nbrPointsLargeur - ESPACE_ENTRE_POINTS
+						|| v.getCoordonnee().z >= nbrPointsHauteur - ESPACE_ENTRE_POINTS
+						|| v.getCoordonnee().y <= -nbrPointsLargeur + ESPACE_ENTRE_POINTS
+						|| v.getCoordonnee().z <= -nbrPointsHauteur + ESPACE_ENTRE_POINTS
 						|| x <= -nbrPointsLongueur + ESPACE_ENTRE_POINTS
 						|| x >= nbrPointsLongueur - ESPACE_ENTRE_POINTS) {
-					carreSuivant.add(u);
+
+					Vector3d temp = new Vector3d(0, 0, 0);
+					temp.normalize(u); // SUS C'est ça la norme?
+
+					cube.add(new Point(u, temp));
 				}
 			}
-			cube.addAll(carreSuivant);
 		}
 	}
 }

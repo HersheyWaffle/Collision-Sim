@@ -14,7 +14,7 @@
 
 <BorderPane fx:id="root" prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controller">
    <center>
-      <Pane fx:id="panePane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+      <Pane fx:id="panePane" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: red;" BorderPane.alignment="CENTER" />
    </center>
    <top>
       <MenuBar BorderPane.alignment="CENTER">

@@ -21,17 +21,55 @@ public class Solide {
 
 //=========================VARIABLES=========================	
 
-	final static int CONSTANTE_OMBRE = 15;
-	private ArrayList<Vector3d> solide = new ArrayList<Vector3d>();
+	Vector3d virtual_centre = new Vector3d(0, 0, 0);
+	static Matrix3d rotation = new Matrix3d();
+
+	final double Z_CONST = 400;
+	final static int CONSTANTE_OMBRE = 10;
+	final double ESPACE_ENTRE_POINT = 1;
+
+	private ArrayList<Point> solide = new ArrayList<Point>();
+	ArrayList<Point> renderedSolide = new ArrayList<Point>();
+	ArrayList<ArrayList<Point>> space = new ArrayList<ArrayList<Point>>();
+	ArrayList<ArrayList<Point>> zBufferSpace;
 
 //=========================METHODES=========================	
 
-	public ArrayList<Vector3d> getSolide() {
+	/**
+	 * Déplace le centre du solide
+	 * 
+	 * @param dv -le déplaceement
+	 */
+	public void deplacement(Vector3d dv) {
+		virtual_centre.add(dv);
+	}
+
+	/**
+	 * @return the solide
+	 */
+	public ArrayList<Point> getSolide() {
 		return solide;
 	}
 
-	public void setSolide(ArrayList<Vector3d> solide) {
+	/**
+	 * @param solide the solide to set
+	 */
+	public void setSolide(ArrayList<Point> solide) {
 		this.solide = solide;
+	}
+
+	/**
+	 * @return the renderedSolide
+	 */
+	public ArrayList<Point> getRenderedSolide() {
+		return renderedSolide;
+	}
+
+	/**
+	 * @param renderedSolide the renderedSolide to set
+	 */
+	public void setRenderedSolide(ArrayList<Point> renderedSolide) {
+		this.renderedSolide = renderedSolide;
 	}
 
 	/**
@@ -39,10 +77,10 @@ public class Solide {
 	 * 
 	 * @param solide - Le ArrayList des points du solide
 	 */
-	public static void enleveDoublons(ArrayList<Vector3d> solide) {
+	public static void enleveDoublons(ArrayList<Point> solide) {
 		int countA = solide.size();
 
-		Set<Vector3d> set = new LinkedHashSet<>();
+		Set<Point> set = new LinkedHashSet<>();
 		set.addAll(solide);
 
 		solide.clear();
@@ -50,8 +88,8 @@ public class Solide {
 
 		int countB = solide.size();
 
-		if(Main.DEBUG_MODE) System.out.println("Avant: " + countA);
-		if(Main.DEBUG_MODE) System.out.println("Apres: " + countB);
+		if (Main.DEBUG_MODE) System.out.println("Avant: " + countA);
+		if (Main.DEBUG_MODE) System.out.println("Apres: " + countB);
 	}
 
 	/**
@@ -86,16 +124,20 @@ public class Solide {
 	}
 
 	/**
-	 * Retourne un ArrayList d'un cercle de points dont les vecteurs sont perpendiculaires au vecteur en paramètre.
+	 * Retourne un ArrayList d'un cercle de points dont les vecteurs sont
+	 * perpendiculaires au vecteur en paramètre.
 	 * 
 	 * @param dThetaCercle - Angle en Rad entre chaque point dans le cercle
-	 * @param v - Le Vector3D duquel nous voulons déterminer le cercle de vecteurs perpendiculaires.
-	 * @param rayon - Le rayon du cercle.
-	 * @param arCercle - L'angle en radians de l'arc du cercle.
+	 * @param v            - Le Vector3D duquel nous voulons déterminer le cercle de
+	 *                     vecteurs perpendiculaires.
+	 * @param rayon        - Le rayon du cercle.
+	 * @param arCercle     - L'angle en radians de l'arc du cercle.
 	 * 
-	 * @return retourne un ArrayList de Vector3D, chacun perpendiculaire au vecteur v.
+	 * @return retourne un ArrayList de Vector3D, chacun perpendiculaire au vecteur
+	 *         v.
 	 */
-	public static ArrayList<Vector3d> cerclePerpendiculaire(double dThetaCercle, Vector3d v, double rayon, double arcCercle) {
+	public static ArrayList<Vector3d> cerclePerpendiculaire(double dThetaCercle, Vector3d v, double rayon,
+			double arcCercle) {
 		ArrayList<Vector3d> cercle = new ArrayList<Vector3d>();
 		Matrix3d rotation = new Matrix3d();
 
@@ -140,14 +182,17 @@ public class Solide {
 	}
 
 	/**
-	 * Retourne un ArrayList d'un cercle de points dont les vecteurs sont perpendiculaires au vecteur en paramètre.
+	 * Retourne un ArrayList d'un cercle de points dont les vecteurs sont
+	 * perpendiculaires au vecteur en paramètre.
 	 * 
 	 * @param dThetaCercle - Angle en Rad entre chaque point dans le cercle
-	 * @param v - Le Vector3D duquel nous voulons déterminer le cercle de vecteurs perpendiculaires.
-	 * @param rayon - Le rayon du cercle.
-	 * @param arCercle - L'angle en radians de l'arc du cercle.
+	 * @param v            - Le Vector3D duquel nous voulons déterminer le cercle de
+	 *                     vecteurs perpendiculaires.
+	 * @param rayon        - Le rayon du cercle.
+	 * @param arCercle     - L'angle en radians de l'arc du cercle.
 	 * 
-	 * @return retourne un ArrayList de Vector3D, chacun perpendiculaire au vecteur v.
+	 * @return retourne un ArrayList de Vector3D, chacun perpendiculaire au vecteur
+	 *         v.
 	 */
 	public static ArrayList<ArrayList<Point>> quadrant(ArrayList<Vector3d> section, ArrayList<Point> objet) {
 
@@ -224,6 +269,106 @@ public class Solide {
 	}
 
 	/**
+	 * Divise la sphere en quadrant avec local-sensivity hashing
+	 */
+	public void quadrant() {
+		ArrayList<Vector3d> section = new ArrayList<Vector3d>();
+
+		section.add(new Vector3d(1, 0, 0));
+		section.add(new Vector3d(0, 1, 0));
+		section.add(new Vector3d(0, 0, 1));
+		space = quadrant(section, solide);
+
+	}
+
+	/**
+	 * Enlève les points côte à côte
+	 */
+	public void clean() {
+		solide.clear();
+		for (ArrayList<Point> quadrant : space) {
+			for (int i = 0; i < quadrant.size() - 1; i++) {
+				for (int j = i + 1; j < quadrant.size(); j++) {
+
+					Vector3d distance = new Vector3d();
+					distance.sub(quadrant.get(i).getCoordonnee(), quadrant.get(j).getCoordonnee());
+
+					if (distance.length() < ESPACE_ENTRE_POINT) {
+						quadrant.remove(j);
+						j--;
+					}
+				}
+			}
+
+			solide.addAll(quadrant);
+		}
+
+	}
+
+	/**
+	 * Calcule le solide à afficher
+	 */
+	public void render(final int FONT_SIZE) {
+		renderedSolide.clear();
+
+		// copie les points de la sphere dans la rendered sphere
+		for (Point p : solide) {
+			Vector3d v = (Vector3d) p.getCoordonnee().clone();
+
+			// update to rendering position
+			v.z += virtual_centre.z + Z_CONST;
+
+			v.x *= (Z_CONST) / (v.z);
+			v.y *= (Z_CONST) / (v.z);
+
+			//
+			v.x += (virtual_centre.x * Z_CONST) / (virtual_centre.z + Z_CONST);
+			v.y += (virtual_centre.y * Z_CONST) / (virtual_centre.z + Z_CONST);
+
+			v.x = ((int) v.x / FONT_SIZE) * FONT_SIZE;
+			v.y = ((int) v.y / FONT_SIZE) * FONT_SIZE;
+
+			Point renderedPoint = new Point(v, new Vector3d());
+			renderedPoint.setEclairage(p.getEclairage());
+			renderedSolide.add(renderedPoint);
+		}
+
+		ArrayList<Vector3d> section = cerclePerpendiculaire(Math.PI / 6, new Vector3d(0, 0, 1), 1, Math.PI);
+
+		zBufferSpace = quadrant(section, renderedSolide);
+
+		// z-buffer
+		for (ArrayList<Point> quadrant : zBufferSpace) {
+			for (int i = 0; i < quadrant.size() - 1; i++) {
+				for (int j = i + 1; j < quadrant.size(); j++) {
+
+					// for vector rendered at the same place
+					if ((int) quadrant.get(i).getCoordonnee().x == (int) quadrant.get(j).getCoordonnee().x
+							&& (int) quadrant.get(i).getCoordonnee().y == (int) quadrant.get(j).getCoordonnee().y) {
+						// delete the farthest one
+						if (quadrant.get(i).getCoordonnee().z < quadrant.get(j).getCoordonnee().z) {
+							quadrant.get(j).setRendered(false);
+						}
+						else {
+							quadrant.get(i).setRendered(false);
+						}
+
+					}
+				}
+			}
+		}
+		Lumiere.ombre_Objet(renderedSolide);
+
+		// to clean renderSphere
+		for (int i = 0; i < renderedSolide.size(); i++) {
+			if (!renderedSolide.get(i).isRendered()) {
+				renderedSolide.remove(renderedSolide.get(i));
+				i--;
+			}
+		}
+	}
+
+	/**
 	 * Effectue une rotation sur le solide. Les paramètres sont en DEGRÉS
 	 * 
 	 * @param solide - Le solide sur lequel on effectue la rotation
@@ -231,40 +376,40 @@ public class Solide {
 	 * @param rotY   - Rotation sur l'axe des Y
 	 * @param rotZ   - Rotation sur l'axe des Z
 	 */
-	public static void rotateSolide(ArrayList<Vector3d> solide, double rotX, double rotY, double rotZ, double posX,
+	public static void rotateSolide(ArrayList<Point> solide, double rotX, double rotY, double rotZ, double posX,
 			double posY, double posZ) {
 		Matrix3d rotation = new Matrix3d(); // Matrice 3D servant à effectuer la rotation des points et des plans
 
-		for (Vector3d v : solide) {
+		for (Point v : solide) {
 			if (rotX != 0) {
-				v.x = v.x - posX;
-				v.y = v.y - posY;
-				v.z = v.z - posZ;
+				v.getCoordonnee().x = v.getCoordonnee().x - posX;
+				v.getCoordonnee().y = v.getCoordonnee().y - posY;
+				v.getCoordonnee().z = v.getCoordonnee().z - posZ;
 				rotation.rotX(rotX * Math.PI / 180);
-				rotation.transform(v);
-				v.x = v.x + posX;
-				v.y = v.y + posY;
-				v.z = v.z + posZ;
+				rotation.transform(v.getCoordonnee());
+				v.getCoordonnee().x = v.getCoordonnee().x + posX;
+				v.getCoordonnee().y = v.getCoordonnee().y + posY;
+				v.getCoordonnee().z = v.getCoordonnee().z + posZ;
 			}
 			if (rotY != 0) {
-				v.x = v.x - posX;
-				v.y = v.y - posY;
-				v.z = v.z - posZ;
+				v.getCoordonnee().x = v.getCoordonnee().x - posX;
+				v.getCoordonnee().y = v.getCoordonnee().y - posY;
+				v.getCoordonnee().z = v.getCoordonnee().z - posZ;
 				rotation.rotY(rotY * Math.PI / 180);
-				rotation.transform(v);
-				v.x = v.x + posX;
-				v.y = v.y + posY;
-				v.z = v.z + posZ;
+				rotation.transform(v.getCoordonnee());
+				v.getCoordonnee().x = v.getCoordonnee().x + posX;
+				v.getCoordonnee().y = v.getCoordonnee().y + posY;
+				v.getCoordonnee().z = v.getCoordonnee().z + posZ;
 			}
 			if (rotZ != 0) {
-				v.x = v.x - posX;
-				v.y = v.y - posY;
-				v.z = v.z - posZ;
+				v.getCoordonnee().x = v.getCoordonnee().x - posX;
+				v.getCoordonnee().y = v.getCoordonnee().y - posY;
+				v.getCoordonnee().z = v.getCoordonnee().z - posZ;
 				rotation.rotZ(rotZ * Math.PI / 180);
-				rotation.transform(v);
-				v.x = v.x + posX;
-				v.y = v.y + posY;
-				v.z = v.z + posZ;
+				rotation.transform(v.getCoordonnee());
+				v.getCoordonnee().x = v.getCoordonnee().x + posX;
+				v.getCoordonnee().y = v.getCoordonnee().y + posY;
+				v.getCoordonnee().z = v.getCoordonnee().z + posZ;
 			}
 		}
 	}
@@ -277,17 +422,19 @@ public class Solide {
 	 *                     solide.
 	 * @param solide       - La liste de tous les points du solide.
 	 */
-	public static void setFormeRotation(double dThetaCercle, ArrayList<Vector3d> plan, ArrayList<Vector3d> solide) {
+	public static void setFormeRotation(double dThetaCercle, ArrayList<Point> plan, ArrayList<Point> solide) {
 		Matrix3d rotation = new Matrix3d(); // Matrice 3D servant à effectuer la rotation des points et des cercles
 		Vector3d u = new Vector3d();
 
 		double theta = 0;
 		do {
 			rotation.rotY(theta);
-			ArrayList<Vector3d> anneau = new ArrayList<Vector3d>();
-			for (Vector3d v : plan) {
-				rotation.transform(v, u);
-				anneau.add((Vector3d) u.clone());
+			ArrayList<Point> anneau = new ArrayList<Point>();
+			for (Point v : plan) {
+				rotation.transform(v.getCoordonnee(), u);
+				Vector3d temp = new Vector3d(0, 0, 0);
+				temp.normalize(u);
+				anneau.add(new Point((Vector3d) u.clone(), temp));
 			}
 
 			solide.addAll(anneau);
@@ -305,7 +452,7 @@ public class Solide {
 	 * @param posY   - La position initiale en Y du solide.
 	 * @param posZ   - La position initiale en Z du solide.
 	 */
-	
+
 	@Deprecated
 	public static void creeForme(ArrayList<Vector3d> solide, Pane pane, double posX, double posY, double posZ) {
 		for (Vector3d v : solide) {

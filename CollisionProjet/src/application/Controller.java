@@ -42,10 +42,15 @@ import javafx.stage.Stage;
 public class Controller {
 //=========================VARIABLES=========================
 
+	final double ROTATION_ANGLE = 15;
+	
 	private Stage stage = new Stage();
 	private ListView<String> lstView;
 	
 	//TODO Set contextMenu, moveable obj, resize, delete
+	
+	//TODO Option menu set font size
+	private int FONT_SIZE = 10;
 	
 	private double centreX = 300;
 	private double centreY = 300;
@@ -305,7 +310,7 @@ public class Controller {
 			lstView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 			lstView.setContextMenu(creeContextMenu());
 			
-			if(Main.DEBUG_MODE) System.out.println("d0one");
+			if(Main.DEBUG_MODE) System.out.println("Set ListView");
 		}
 		
 		lstView.setItems(Main.listeNoms);
@@ -317,44 +322,48 @@ public class Controller {
 			}
 
 			Cube cube = new Cube(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()),
-					Double.valueOf(txtHau.getText()));
+					Double.valueOf(txtHau.getText()), FONT_SIZE);
 
 			Main.listeSolides.add(cube);
 			Main.listeNoms.add(txtNom.getText());
 			Main.mapSolideNom.put(txtNom.getText(), cube);
-
-			Solide.creeForme(cube.getCube(), pane, Double.valueOf(txtX.getText()) + 300,
-					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
+			Main.update(cube, pane);
+			
+//			Solide.creeForme(cube.getCube(), pane, Double.valueOf(txtX.getText()) + 300,
+//					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
 		}
 		else if (txtTitreParam.getText().toLowerCase().contains("sphère")) {
-			Sphere sphere = new Sphere(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()));
+			Sphere sphere = new Sphere(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()), FONT_SIZE);
 
 			Main.listeSolides.add(sphere);
 			Main.listeNoms.add(txtNom.getText());
 			Main.mapSolideNom.put(txtNom.getText(), sphere);
-
-			Solide.creeForme(sphere.getSphere(), pane, Double.valueOf(txtX.getText()) + 300,
-					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
+			Main.update(sphere, pane);
+			
+//			Solide.creeForme(sphere.getSphere(), pane, Double.valueOf(txtX.getText()) + 300,
+//					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
 		}
 		else if (txtTitreParam.getText().toLowerCase().contains("cône")) {
-			Cone cone = new Cone(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()));
+			Cone cone = new Cone(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()), FONT_SIZE);
 
 			Main.listeSolides.add(cone);
 			Main.listeNoms.add(txtNom.getText());
 			Main.mapSolideNom.put(txtNom.getText(), cone);
-
-			Solide.creeForme(cone.getCone(), pane, Double.valueOf(txtX.getText()) + 300,
-					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
+			Main.update(cone, pane);
+			
+//			Solide.creeForme(cone.getCone(), pane, Double.valueOf(txtX.getText()) + 300,
+//					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
 		}
 		else if (txtTitreParam.getText().toLowerCase().contains("cylindre")) {
-			Cylindre cylindre = new Cylindre(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()));
+			Cylindre cylindre = new Cylindre(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()), FONT_SIZE);
 
 			Main.listeSolides.add(cylindre);
 			Main.listeNoms.add(txtNom.getText());
 			Main.mapSolideNom.put(txtNom.getText(), cylindre);
-
-			Solide.creeForme(cylindre.getCylindre(), pane, Double.valueOf(txtX.getText()) + 300,
-					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
+			Main.update(cylindre, pane);
+			
+//			Solide.creeForme(cylindre.getCylindre(), pane, Double.valueOf(txtX.getText()) + 300,
+//					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
 		}
 
 		if(Main.DEBUG_MODE) System.out.println(txtLon.getText() + " " + txtLar.getText() + " " + txtHau.getText());
@@ -373,32 +382,62 @@ public class Controller {
 
 			@Override
 			public void handle(KeyEvent arg0) {
-				double posNeg = arg0.isShiftDown() ? -15 : 15;
+				double posNeg = arg0.isShiftDown() ? -1 : 1;
+				
 				Pane pane = (Pane) Main.root.getChildren().get(0);
 
-				ArrayList<Vector3d> tousPoints = new ArrayList<Vector3d>();
+				ArrayList<Point> tousPoints = new ArrayList<Point>();
 				for (Solide s : Main.listeSolides) {
 					tousPoints.addAll(s.getSolide());
 					if(Main.DEBUG_MODE) System.out.println(tousPoints.size());
 				}
 
+				Solide tousSolides = new Solide();
+				tousSolides.setSolide(tousPoints);
+				
 				if (arg0.getCode() == KeyCode.X) {
-					Solide.rotateSolide(tousPoints, posNeg, 0, 0, centreX, centreY, centreZ);
+					Solide.rotateSolide(tousPoints, ROTATION_ANGLE*posNeg, 0, 0, centreX, centreY, centreZ);
 					if(Main.DEBUG_MODE) System.out.println("x");
 				}
 				else if (arg0.getCode() == KeyCode.C) {
-					Solide.rotateSolide(tousPoints, 0, posNeg, 0, centreX, centreY, centreZ);
+					Solide.rotateSolide(tousPoints, 0, ROTATION_ANGLE*posNeg, 0, centreX, centreY, centreZ);
 					if(Main.DEBUG_MODE) System.out.println("y");
 				}
 				else if (arg0.getCode() == KeyCode.Z) {
-					Solide.rotateSolide(tousPoints, 0, 0, posNeg, centreX, centreY, centreZ);
+					Solide.rotateSolide(tousPoints, 0, 0, ROTATION_ANGLE*posNeg, centreX, centreY, centreZ);
 					if(Main.DEBUG_MODE) System.out.println("z");
+				}
+				else if(arg0.getCode() == KeyCode.UP) {
+					tousSolides.deplacement(new Vector3d(0,-5,0));
+					Main.update(tousSolides, pane);
+				}
+				else if (arg0.getCode() == KeyCode.DOWN) {
+					tousSolides.deplacement(new Vector3d(0, 5, 0));
+					Main.update(tousSolides, pane);
+				}
+				else if (arg0.getCode() == KeyCode.LEFT) {
+					tousSolides.deplacement(new Vector3d(-5, 0, 0));
+					Main.update(tousSolides, pane);
+
+				}
+				else if (arg0.getCode() == KeyCode.RIGHT) {
+					tousSolides.deplacement(new Vector3d(5, 0, 0));
+					Main.update(tousSolides, pane);
+				}
+				else if (arg0.getCode() == KeyCode.W) {
+					tousSolides.deplacement(new Vector3d(0, 0, 5));
+					Main.update(tousSolides, pane);
+				}
+				else if (arg0.getCode() == KeyCode.S) {
+					tousSolides.deplacement(new Vector3d(0, 0, -5));
+					Main.update(tousSolides, pane);
 				}
 				else {
 					return;
 				}
-				pane.getChildren().removeAll(pane.getChildren());
-				Solide.creeForme(tousPoints, pane, 0, 0, 0);
+				//LEGACY CODE
+//				pane.getChildren().removeAll(pane.getChildren());
+//				Solide.creeForme(tousPoints, pane, 0, 0, 0);
 			}
 		};
 	}
@@ -411,8 +450,8 @@ public class Controller {
 			@Override
 			public void handle(ActionEvent e) {
 				for(String s : lstView.getSelectionModel().getSelectedItems()) {
-					for(Vector3d v : Main.mapSolideNom.get(s).getSolide()) {
-						//
+					for(Point v : Main.mapSolideNom.get(s).getSolide()) {
+						//TODO
 					}
 					((Pane) Main.root.getCenter()).getChildren().remove(lstView.getSelectionModel().getSelectedIndex());
 					Main.listeSolides.remove(Main.mapSolideNom.get(s));

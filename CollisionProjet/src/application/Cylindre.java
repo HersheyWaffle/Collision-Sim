@@ -19,10 +19,10 @@ public class Cylindre extends Solide {
 	private double rayon; // Rayon du cercle
 	private double hauteur; // Hateur du cylindre
 	private double dThetaCercle; // Angle en Rad entre chaque point dans le cercle
-	private ArrayList<Vector3d> carre = new ArrayList<Vector3d>(); // Liste des vecteurs 3D de chaque point dans le
-																	// cercle
-	private ArrayList<Vector3d> cylindre = new ArrayList<Vector3d>(); // Liste des vecteurs 3D de chaque point dans le
-																		// cylindre
+	private ArrayList<Point> carre = new ArrayList<Point>(); // Liste des vecteurs 3D de chaque point dans le
+																// cercle
+	private ArrayList<Point> cylindre = new ArrayList<Point>(); // Liste des vecteurs 3D de chaque point dans le
+																// cylindre
 
 //=========================CONSTRUCTEUR=======================
 
@@ -31,8 +31,9 @@ public class Cylindre extends Solide {
 	 * 
 	 * @param rayon   - Le rayon du cylindre.
 	 * @param hauteur - La hauteur du cylindre.
+	 * @param FONT_SIZE - taille des caractères
 	 */
-	public Cylindre(double rayon, double hauteur) {
+	public Cylindre(double rayon, double hauteur, final int FONT_SIZE) {
 		this.rayon = rayon;
 		this.hauteur = hauteur;
 		dThetaCercle = 2 * Math.PI / (2 * rayon / ESPACE_ENTRE_POINTS);
@@ -41,16 +42,19 @@ public class Cylindre extends Solide {
 		Solide.setFormeRotation(dThetaCercle, carre, cylindre);
 		Solide.enleveDoublons(getCylindre());
 
+		quadrant();
+		clean();
+		render(FONT_SIZE);
 		setSolide(cylindre);
 	}
 
 //=========================METHODES=========================
 
-	public ArrayList<Vector3d> getCylindre() {
+	public ArrayList<Point> getCylindre() {
 		return cylindre;
 	}
 
-	public ArrayList<Vector3d> getCarre() {
+	public ArrayList<Point> getCarre() {
 		return carre;
 	}
 
@@ -74,7 +78,12 @@ public class Cylindre extends Solide {
 		// Cree le plan
 		for (double y = -hauteur; y <= hauteur; y += ESPACE_ENTRE_POINTS) {
 			for (double z = -rayon; z <= 0; z += ESPACE_ENTRE_POINTS) {
-				if (y >= hauteur || y <= -hauteur || z >= rayon || z <= -rayon) carre.add(new Vector3d(0, y, z));
+				if (y >= hauteur || y <= -hauteur || z >= rayon || z <= -rayon) {
+					Vector3d temp = new Vector3d(0, 0, 0);
+					Vector3d u = new Vector3d(0, y, z);
+					temp.normalize(u); // SUS C'est ça la norme?
+					carre.add(new Point(u, temp));
+				}
 			}
 		}
 	}

@@ -21,9 +21,9 @@ public class Sphere extends Solide {
 	private double decalage; // Decalage du cercle de son origine, pour former un tore
 	private double dThetaCercle; // Angle en Rad entre chaque point dans le cercle
 
-	private ArrayList<Vector3d> cercle = new ArrayList<Vector3d>(); // Liste des vecteurs 3D de chaque point dans le
+	private ArrayList<Point> cercle = new ArrayList<Point>(); // Liste des vecteurs 3D de chaque point dans le
 																	// cercle
-	private ArrayList<Vector3d> sphere = new ArrayList<Vector3d>(); // Liste des listes des vecteurs 3D de chaque point
+	private ArrayList<Point> sphere = new ArrayList<Point>(); // Liste des listes des vecteurs 3D de chaque point
 																	// dans chaque cercle
 
 //=========================CONSTRUCTEUR=======================	
@@ -33,8 +33,9 @@ public class Sphere extends Solide {
 	 * 
 	 * @param rayon    - Le rayon de la sphere
 	 * @param decalage - Le decalage du cercle. Va former un Tore.
+	 * @param FONT_SIZE - taille des caractères
 	 */
-	public Sphere(double rayon, double decalage) {
+	public Sphere(double rayon, double decalage, final int FONT_SIZE) {
 		this.rayon = rayon;
 		this.decalage = decalage;
 		dThetaCercle = 2 * Math.PI / (rayon / ESPACE_ENTRE_POINTS);
@@ -43,6 +44,9 @@ public class Sphere extends Solide {
 		Solide.setFormeRotation(dThetaCercle, cercle, sphere);
 		Solide.enleveDoublons(getSphere());
 
+		quadrant();
+		clean();
+		render(FONT_SIZE);
 		setSolide(sphere);
 	}
 
@@ -54,7 +58,7 @@ public class Sphere extends Solide {
 	 * @return retourne un ArrayList de vecteurs 3D chacun indiquant la position 3D
 	 *         du point.
 	 */
-	public ArrayList<Vector3d> getSphere() {
+	public ArrayList<Point> getSphere() {
 		return sphere;
 	}
 
@@ -83,7 +87,7 @@ public class Sphere extends Solide {
 	 * @return retourne un ArrayList de vecteurs 3D chacun indiquant la position 3D
 	 *         du point.
 	 */
-	public ArrayList<Vector3d> getCercle() {
+	public ArrayList<Point> getCercle() {
 		return cercle;
 	}
 
@@ -98,8 +102,10 @@ public class Sphere extends Solide {
 			rotation.rotZ(theta);
 			Vector3d initial = new Vector3d(rayon, 0, 0);
 			rotation.transform(initial);
-			initial.add(new Vector3d(decalage, 0, 0));
-			cercle.add(initial);
+			Vector3d v = new Vector3d(decalage, 0, 0);
+			initial.add(v);
+			v.normalize(initial);
+			cercle.add(new Point(initial, v));
 
 			theta += dThetaCercle;
 		} while (theta < 2 * Math.PI);
