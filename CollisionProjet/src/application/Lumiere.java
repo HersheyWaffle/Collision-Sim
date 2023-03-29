@@ -7,7 +7,7 @@ import javax.vecmath.Vector3d;
 import javax.vecmath.Matrix3d;
 
 public class Lumiere {
-	static Vector3d source = new Vector3d(0,-3,-1);
+	static Vector3d source = new Vector3d(0,-1,-1);
 	static String lumière = ".,-~:;=!*#$@";
 	static int intensité_lumineuse=2;
 	/*
@@ -22,7 +22,7 @@ public class Lumiere {
 	}*/
 	
 	static public void ombre_Objet(ArrayList<Point> objet) {
-		ArrayList<Vector3d> section = Solide.semicercle(Math.PI/5, source, 1);
+		ArrayList<Vector3d> section = Solide.cercle(Math.PI/5, source, 1, Math.PI);
 		ArrayList<ArrayList<Point>> ensemble = Solide.quadrant(section, objet);
 		
 		for(ArrayList<Point> quadrant : ensemble) {

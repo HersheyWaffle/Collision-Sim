@@ -26,8 +26,9 @@ import javax.vecmath.Matrix3d;
  * @author Omar Ghazaly, Abel-Jimmy Oyono-Montoki
  */
 public class Main extends Application {
-
-	final static int FONT_SIZE = 10;
+	
+	Vector3d rendering_centre = new Vector3d(0, 0, 0);// Origine de l'affichage
+	int FONT_SIZE = 10; // taile des caractère
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -36,26 +37,30 @@ public class Main extends Application {
 			Pane root = new Pane();
 			root.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
 			Scene scene = new Scene(root, 400, 400);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			
 			primaryStage.setScene(scene);
 			primaryStage.show();
-
-			Sphere s = new Sphere(50, 25, 50, FONT_SIZE, new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0));
-
 			
-
-			update(s, root);
-
+			rendering_centre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
+			Sphere s1 = new Sphere(25, 50, 50, FONT_SIZE);
+			Sphere s2 = new Sphere(25, 50, 50, FONT_SIZE);
 			
-
+			
+			
+			
+			update(root,s1,s2);
+			
+			
+			
+			//réajuse l'origine 
 			scene.widthProperty().addListener((obs, oldVal, newVal) -> {
-				s.rendering_centre_Update(new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0));
-				update(s, root);
+				rendering_centre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
+				update(root,s1,s2);
 			});
 
 			scene.heightProperty().addListener((obs, oldVal, newVal) -> {
-				s.rendering_centre_Update(new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0));
-				update(s, root);
+				rendering_centre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
+				update(root,s1,s2);
 			});
 
 			root.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -66,39 +71,53 @@ public class Main extends Application {
 					
 
 					if (arg0.getCode() == KeyCode.X) {
-						s.rotate(posNeg, 0, 0);
-						System.out.println("nbr rendered point: " + s.renderedSphere.size());
-						update(s, root);
+						s1.rotate(posNeg, 0, 0);
+						//System.out.println("nbr rendered point: " + s1.renderedSolide.size());
+						
+						update(root,s1,s2);
 					} else if (arg0.getCode() == KeyCode.Y) {
-						s.rotate(0, posNeg, 0);
-						System.out.println("nbr rendered point: " + s.renderedSphere.size());
-						update(s, root);
+						s1.rotate(0, posNeg, 0);
+						//System.out.println("nbr rendered point: " + s1.renderedSolide.size());
+						
+						update(root,s1,s2);
 					} else if (arg0.getCode() == KeyCode.Z) {
-						s.rotate(0, 0, posNeg);
-						System.out.println("nbr rendered point: " + s.renderedSphere.size());
-						update(s, root);
+						s1.rotate(0, 0, posNeg);
+						//System.out.println("nbr rendered point: " + s1.renderedSolide.size());
+						update(root,s1,s2);
 					}
 					
 					else if(arg0.getCode() == KeyCode.UP) {
-						s.déplacement(new Vector3d(0,-5,0));
-						update(s, root);
+						
+						s1.déplacement(new Vector3d(0,-5,0));
+						
+						update(root,s1,s2);
 						
 					}else if(arg0.getCode() == KeyCode.DOWN) {
-						s.déplacement(new Vector3d(0,5,0));
-						update(s, root);
+						
+						s1.déplacement(new Vector3d(0,5,0));
+						
+						update(root,s1,s2);
 					}else if(arg0.getCode() == KeyCode.LEFT) {
-						s.déplacement(new Vector3d(-5,0,0));
-						update(s, root);
+						
+						s1.déplacement(new Vector3d(-5,0,0));
+						
+						update(root,s1,s2);
 						
 					}else if(arg0.getCode() == KeyCode.RIGHT) {
-						s.déplacement(new Vector3d(5,0,0));
-						update(s, root);
+						
+						s1.déplacement(new Vector3d(5,0,0));
+						
+						update(root,s1,s2);
 					}else if(arg0.getCode() == KeyCode.W) {
-						s.déplacement(new Vector3d(0,0,5));
-						update(s, root);
+						
+						s1.déplacement(new Vector3d(0,0,5));
+						
+						update(root,s1,s2);
 					}else if(arg0.getCode() == KeyCode.S) {
-						s.déplacement(new Vector3d(0,0,-5));
-						update(s, root);
+						
+						s1.déplacement(new Vector3d(0,0,-5));
+						
+						update(root,s1,s2);
 					}
 				}
 
@@ -111,19 +130,48 @@ public class Main extends Application {
 		}
 
 	}
-
-	public static void update(Sphere s, Pane root) {
-		s.render(FONT_SIZE);
-
+	
+	
+	
+	public void update(Pane root,Solide... solides) {
 		root.getChildren().clear();
-		for (Point p : s.renderedSphere) {
+		for(Solide s : solides) {
+			s.isColliding = false;
+		}
+		
+		
+		
+		for(int i=0; i<solides.length-1;i++) {
+			for(int j=i+1; j<solides.length;j++) {
+				if(solides[i].DetecteurDeCollision(solides[j].virtual_centre, solides[j].rayonDeCollision) ) {
+					solides[i].isColliding = true;
+					solides[j].isColliding = true;
+					
+				}else {
+					
+				}
+			}
+		}
+		
+		for(Solide s : solides) {
+			update(s, root);
+		}
+		
+	}
+
+	public void update(Solide s, Pane root) {
+		s.render(FONT_SIZE);
+		
+		Color c = s.isColliding?Color.RED:Color.WHITE;
+		for (Point p : s.renderedSolide) {
 
 			Text t = new Text(p.getÉclairage());
-			t.setFill(Color.WHITE);
+			t.setFill(c);
+			
 
-			t.setFont(Font.font(STYLESHEET_CASPIAN, FontWeight.BOLD, FONT_SIZE));
-			t.setLayoutX(p.getCoordonnée().x + s.rendering_centre.x);
-			t.setLayoutY(p.getCoordonnée().y + s.rendering_centre.y );
+			t.setFont(Font.font(STYLESHEET_CASPIAN, FontWeight.BOLD, s.FONT_SIZE));
+			t.setLayoutX(p.getCoordonnée().x + rendering_centre.x);
+			t.setLayoutY(p.getCoordonnée().y + rendering_centre.y );
 
 			root.getChildren().add(t);
 		}

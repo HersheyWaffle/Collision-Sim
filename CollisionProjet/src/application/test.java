@@ -56,6 +56,9 @@ public class test {
 		
 		rotation.rotY(-phi2);
 		rotation.transform(v);
+		
+		
+		
 		//System.out.println(v);
 		
 		
