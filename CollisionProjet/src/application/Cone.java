@@ -38,6 +38,7 @@ public class Cone extends Solide {
 		this.hauteur = hauteur;
 		dThetaCercle = 2 * Math.PI / (2 * rayon / ESPACE_ENTRE_POINTS);
 
+		virtual_centre = new Vector3d(0, 0, 0);
 		setTriangle();
 		Solide.setFormeRotation(dThetaCercle, triangle, cone);
 		Solide.enleveDoublons(getCone());
@@ -82,11 +83,11 @@ public class Cone extends Solide {
 			Vector3d temp = new Vector3d(0, 0, 0);
 
 			Vector3d u = new Vector3d(0, 0, y);
-			temp.normalize(u); // SUS C'est ça la norme?
+			temp = getPerpendicular(u); // SUS C'est ça la norme?
 			triangle.add(new Point(u, temp));
 
 			Vector3d v = new Vector3d(0, z, y);
-			temp.normalize(v); // SUS C'est ça la norme?
+			temp = getPerpendicular(v); // SUS C'est ça la norme?
 			triangle.add(new Point(v, temp));
 		}
 	}

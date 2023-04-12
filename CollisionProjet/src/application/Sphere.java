@@ -40,6 +40,7 @@ public class Sphere extends Solide {
 		this.decalage = decalage;
 		dThetaCercle = 2 * Math.PI / (rayon / ESPACE_ENTRE_POINTS);
 
+		virtual_centre = new Vector3d(0, 0, 0);
 		setCercle();
 		Solide.setFormeRotation(dThetaCercle, cercle, sphere);
 		Solide.enleveDoublons(getSphere());
@@ -104,8 +105,8 @@ public class Sphere extends Solide {
 			rotation.transform(initial);
 			Vector3d v = new Vector3d(decalage, 0, 0);
 			initial.add(v);
-			v.normalize(initial);
-			cercle.add(new Point(initial, v));
+			//v.normalize(initial);
+			cercle.add(new Point(initial, (Vector3d) initial.clone()));
 
 			theta += dThetaCercle;
 		} while (theta < 2 * Math.PI);

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import javax.vecmath.Vector3d;
 
 public class Lumiere {
-	static Vector3d source = new Vector3d(0,-3,-1);
+	static Vector3d source = new Vector3d(0,-1,-1);
 	static String lumière = ".,-~:;=!*#$@";
 	static int intensité_lumineuse=2;
 	/*
@@ -28,9 +28,10 @@ public class Lumiere {
 		
 	}
 	
-	public static void lumière_Objet(ArrayList<Point> objet) {
+	public static void lumiere_Objet(ArrayList<Point> objet) {
 		source.normalize();
 		for(Point n : objet) {
+			n.getNorme().normalize();
 			double d = Math.floor((lumière.length()-1)*Math.pow(source.dot(n.getNorme()), 0.6) );
 			if(d>=0) {
 				

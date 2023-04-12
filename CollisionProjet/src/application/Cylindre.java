@@ -38,6 +38,7 @@ public class Cylindre extends Solide {
 		this.hauteur = hauteur;
 		dThetaCercle = 2 * Math.PI / (2 * rayon / ESPACE_ENTRE_POINTS);
 
+		virtual_centre = new Vector3d(0, 0, 0);
 		setCarre();
 		Solide.setFormeRotation(dThetaCercle, carre, cylindre);
 		Solide.enleveDoublons(getCylindre());
@@ -81,7 +82,7 @@ public class Cylindre extends Solide {
 				if (y >= hauteur || y <= -hauteur || z >= rayon || z <= -rayon) {
 					Vector3d temp = new Vector3d(0, 0, 0);
 					Vector3d u = new Vector3d(0, y, z);
-					temp.normalize(u); // SUS C'est ça la norme?
+					temp = getPerpendicular(u); // SUS C'est ça la norme?
 					carre.add(new Point(u, temp));
 				}
 			}

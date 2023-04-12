@@ -28,9 +28,9 @@ public class Cube extends Solide {
 	/**
 	 * Objet cubique.
 	 * 
-	 * @param longueur - La longueur du cube.
-	 * @param largeur  - La largeur du cube.
-	 * @param hauteur  - La hauteur du cube.
+	 * @param longueur  - La longueur du cube.
+	 * @param largeur   - La largeur du cube.
+	 * @param hauteur   - La hauteur du cube.
 	 * @param FONT_SIZE - taille des caractères
 	 */
 	public Cube(double longueur, double largeur, double hauteur, final int FONT_SIZE) {
@@ -38,6 +38,7 @@ public class Cube extends Solide {
 		nbrPointsLargeur = largeur;
 		nbrPointsHauteur = hauteur;
 
+		virtual_centre = new Vector3d(0, 0, 0);
 		setCarre();
 		setCube();
 		Solide.enleveDoublons(getCube());
@@ -86,8 +87,7 @@ public class Cube extends Solide {
 		// Cree le plan
 		for (double y = -nbrPointsLargeur; y <= nbrPointsLargeur; y += ESPACE_ENTRE_POINTS) {
 			for (double z = -nbrPointsHauteur; z <= nbrPointsHauteur; z += ESPACE_ENTRE_POINTS) {
-				Vector3d temp = new Vector3d(0, 0, 0);
-				temp.normalize(new Vector3d(nbrPointsLongueur / 2, y, z)); // SUS C'est ça la norme?
+				Vector3d temp = new Vector3d(1, 0, 0);
 				carre.add(new Point(new Vector3d(nbrPointsLongueur / 2, y, z), temp));
 			}
 		}
@@ -96,16 +96,39 @@ public class Cube extends Solide {
 	public void setCube() {
 		for (double x = nbrPointsLongueur; x >= -nbrPointsLongueur; x -= ESPACE_ENTRE_POINTS) {
 			for (Point v : carre) {
-				Vector3d u = new Vector3d(x, v.getCoordonnee().y, v.getCoordonnee().z);
-				if (v.getCoordonnee().y >= nbrPointsLargeur - ESPACE_ENTRE_POINTS
-						|| v.getCoordonnee().z >= nbrPointsHauteur - ESPACE_ENTRE_POINTS
-						|| v.getCoordonnee().y <= -nbrPointsLargeur + ESPACE_ENTRE_POINTS
-						|| v.getCoordonnee().z <= -nbrPointsHauteur + ESPACE_ENTRE_POINTS
-						|| x <= -nbrPointsLongueur + ESPACE_ENTRE_POINTS
-						|| x >= nbrPointsLongueur - ESPACE_ENTRE_POINTS) {
+				if (v.getCoordonnee().y >= nbrPointsLargeur - ESPACE_ENTRE_POINTS) {
+					Vector3d u = new Vector3d(x, v.getCoordonnee().y, v.getCoordonnee().z);
+					Vector3d temp = new Vector3d(0, 1, 0);
 
-					Vector3d temp = new Vector3d(0, 0, 0);
-					temp.normalize(u); // SUS C'est ça la norme?
+					cube.add(new Point(u, temp));
+				}
+				else if (v.getCoordonnee().z >= nbrPointsHauteur - ESPACE_ENTRE_POINTS) {
+					Vector3d u = new Vector3d(x, v.getCoordonnee().y, v.getCoordonnee().z);
+					Vector3d temp = new Vector3d(0, 0, 1);
+
+					cube.add(new Point(u, temp));
+				}
+				else if (v.getCoordonnee().y <= -nbrPointsLargeur + ESPACE_ENTRE_POINTS) {
+					Vector3d u = new Vector3d(x, v.getCoordonnee().y, v.getCoordonnee().z);
+					Vector3d temp = new Vector3d(0, -1, 0);
+
+					cube.add(new Point(u, temp));
+				}
+				else if (v.getCoordonnee().z <= -nbrPointsHauteur + ESPACE_ENTRE_POINTS) {
+					Vector3d u = new Vector3d(x, v.getCoordonnee().y, v.getCoordonnee().z);
+					Vector3d temp = new Vector3d(0, 0, -1);
+
+					cube.add(new Point(u, temp));
+				}
+				else if (x <= -nbrPointsLongueur + ESPACE_ENTRE_POINTS) {
+					Vector3d u = new Vector3d(x, v.getCoordonnee().y, v.getCoordonnee().z);
+					Vector3d temp = new Vector3d(-1, 0, 0);
+
+					cube.add(new Point(u, temp));
+				}
+				else if (x >= nbrPointsLongueur - ESPACE_ENTRE_POINTS) {
+					Vector3d u = new Vector3d(x, v.getCoordonnee().y, v.getCoordonnee().z);
+					Vector3d temp = new Vector3d(1, 0, 0);
 
 					cube.add(new Point(u, temp));
 				}

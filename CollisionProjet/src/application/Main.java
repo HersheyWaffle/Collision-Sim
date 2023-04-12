@@ -1,6 +1,7 @@
 package application;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.vecmath.Vector3d;
@@ -28,8 +29,19 @@ public class Main extends Application {
 	public static final boolean DEBUG_MODE = true;
 
 	public static BorderPane root;
+	/**
+	 * La ObservableList des solides dans la scène
+	 */
 	public static ObservableList<Solide> listeSolides = FXCollections.observableArrayList();
+	/**
+	 * La ObservableList des string représentant le nom des Solides, Doit être
+	 * unique, car utilisé pour le hashmap qui les lie ensemble
+	 */
 	public static ObservableList<String> listeNoms = FXCollections.observableArrayList();
+	/**
+	 * Le HashMap qui relie le solide à son nom, pour pouvoir le traiter dans le
+	 * tableau ListView.
+	 */
 	public static HashMap<String, Solide> mapSolideNom = new HashMap<String, Solide>();
 
 	public static Vector3d rendering_centre = new Vector3d(0, 0, 0);// Origine de l'affichage
@@ -45,11 +57,22 @@ public class Main extends Application {
 			Scene scene = new Scene(root);
 
 			rendering_centre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
-			
-			//GENERALISE INTO CONTROLLER
+
+			// réajuse l'origine
+			scene.widthProperty().addListener((obs, oldVal, newVal) -> {
+				rendering_centre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
+				update(listeSolides, Color.WHITE);
+			});
+
+			scene.heightProperty().addListener((obs, oldVal, newVal) -> {
+				rendering_centre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
+				update(listeSolides, Color.WHITE);
+			});
+
+			// GENERALISE INTO CONTROLLER
 //			Sphere s = new Sphere(50, 25, FONT_SIZE);
 //			update(s, root);
-			
+
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setTitle("Simulateur de collisions");
 			primaryStage.setScene(scene);
@@ -66,24 +89,82 @@ public class Main extends Application {
 
 	}
 
-	public static void update(Solide s, Pane pane) {
-		s.render(FONT_SIZE);
+	/**
+	 * Affiche les caractères ASCII du solide sur la scène.
+	 * 
+	 * @param s   - Le solide qu'on veut afficher.
+	 * @param col - La couleur dans laquelle on veut l'afficher
+	 */
+	public static void update(ObservableList<Solide> sList, Color col) {
+		((Pane) root.getCenter()).getChildren().clear();
 
-		pane.getChildren().clear();
-		for (Point p : s.renderedSolide) {
+		for (Solide s : sList) {
+			s.render(FONT_SIZE);
 
-			Text t = new Text(p.getEclairage());
-			t.setFill(Color.WHITE);
+			for (Point p : s.renderedSolide) {
 
-			t.setFont(Font.font(STYLESHEET_CASPIAN, FontWeight.BOLD, FONT_SIZE));
-			t.setLayoutX(p.getCoordonnee().x + rendering_centre.x);
-			t.setLayoutY(p.getCoordonnee().y + rendering_centre.y );
+				Text t = new Text(p.getEclairage());
+				t.setFill(col);
 
-			pane.getChildren().add(t);
+				t.setFont(Font.font(STYLESHEET_CASPIAN, FontWeight.BOLD, FONT_SIZE));
+				t.setLayoutX(p.getCoordonnee().x + rendering_centre.x);
+				t.setLayoutY(p.getCoordonnee().y + rendering_centre.y);
+
+				((Pane) root.getCenter()).getChildren().add(t);
+			}
 		}
-
 	}
-	
+
+	/**
+	 * Affiche les caractères ASCII du solide sur la scène. Si un solide est dans la
+	 * liste en paramètre, il sera affiché en rouge au lieu de blanc. À utiliser
+	 * pour montrer quels solides sont séléctionnés dans la ListView de la scène
+	 * 
+	 * @param solide - Le ArrayList de tous les solides séléctionnés.
+	 * @param col    - La couleur dans laquelle on veut afficher les solides dans la liste. Les autres seront affichés en blanc.
+	 */
+	public static void updateSelective(ArrayList<Solide> solide, Color col) {
+		((Pane) root.getCenter()).getChildren().clear();
+
+		for (Solide s : listeSolides) {
+			boolean solideSelected = false;
+
+			for (Solide s2 : solide) {
+				if (s2.equals(s)) solideSelected = true;
+			}
+			if (solideSelected) continue;
+
+			s.render(FONT_SIZE);
+
+			for (Point p : s.renderedSolide) {
+
+				Text t = new Text(p.getEclairage());
+				t.setFill(Color.WHITE);
+
+				t.setFont(Font.font(STYLESHEET_CASPIAN, FontWeight.BOLD, FONT_SIZE));
+				t.setLayoutX(p.getCoordonnee().x + rendering_centre.x);
+				t.setLayoutY(p.getCoordonnee().y + rendering_centre.y);
+
+				((Pane) root.getCenter()).getChildren().add(t);
+			}
+		}
+		for (Solide s : solide) {
+			s.render(FONT_SIZE);
+
+			for (Point p : s.renderedSolide) {
+
+				Text t = new Text(p.getEclairage());
+				t.setFill(col);
+
+				t.setFont(Font.font(STYLESHEET_CASPIAN, FontWeight.BOLD, FONT_SIZE));
+				t.setLayoutX(p.getCoordonnee().x + rendering_centre.x);
+				t.setLayoutY(p.getCoordonnee().y + rendering_centre.y);
+
+				((Pane) root.getCenter()).getChildren().add(t);
+			}
+		}
+	}
+
 	public static void main(String[] args) {
 		launch(args);
 	}
