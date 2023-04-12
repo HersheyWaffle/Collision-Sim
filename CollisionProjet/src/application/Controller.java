@@ -41,6 +41,7 @@ import javafx.stage.Stage;
  * @author Omar Ghazaly
  */
 public class Controller {
+
 //=========================VARIABLES=========================
 
 	final double ROTATION_ANGLE = Math.PI / 12;
@@ -48,7 +49,7 @@ public class Controller {
 	private Stage stage = new Stage();
 	private ListView<String> lstView;
 
-	// TODO Set contextMenu, moveable obj, resize, delete
+	// TODO Set contextMenu, moveable obj, resize
 
 	// TODO Option menu set font size
 	private int FONT_SIZE = 10;
@@ -162,7 +163,7 @@ public class Controller {
 	protected void afficheAPropos(ActionEvent arg0) {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		DialogPane panneauAPropos = alert.getDialogPane(); // panneau racine de la fenetre
-		panneauAPropos.setMinSize(500, 250);
+		panneauAPropos.setMinSize(500, 325);
 
 		VBox panneauTitresEtTextes = new VBox(); // panneau de textes
 		panneauTitresEtTextes.setPadding(new Insets(10));
@@ -171,7 +172,7 @@ public class Controller {
 		txtTitre.setFont(Font.font("Arial", FontWeight.BOLD, 20));
 		VBox.setMargin(txtTitre, new Insets(0, 0, 5, 0));
 
-		Text txtAbout = new Text("Version: 0.0.1" + "\nAuteurs: Omar Ghazaly et Abel-Jimmy Oyono-Montoki");
+		Text txtAbout = new Text("Version: 0.4.0" + "\nAuteurs: Omar Ghazaly et Abel-Jimmy Oyono-Montoki");
 		txtAbout.setFont(Font.font("Arial", 14));
 		VBox.setMargin(txtAbout, new Insets(0, 0, 10, 0));
 
@@ -184,8 +185,18 @@ public class Controller {
 		txtInstructions.setFont(Font.font("Arial", 14));
 		VBox.setMargin(txtInstructions, new Insets(0, 0, 15, 0));
 
+		Text txtTitreControles = new Text("Contrôles");
+		txtTitreControles.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+		VBox.setMargin(txtTitreControles, new Insets(20, 0, 5, 0));
+
+		Text txtControles = new Text("X, Y, C: Rotation de la scène. Peser Shift pour tourner dans le sens inverse."
+				+ "\nBoutons flèche: Déplacement de la scène." + "\nW, S: Déplacement de la scène en profondeur.");
+		txtControles.setFont(Font.font("Arial", 14));
+		VBox.setMargin(txtControles, new Insets(0, 0, 15, 0));
+
 		// ajoute les titres au panneauTitresEtTextes
-		panneauTitresEtTextes.getChildren().addAll(txtTitre, txtAbout, txtTitreInstructions, txtInstructions);
+		panneauTitresEtTextes.getChildren().addAll(txtTitre, txtAbout, txtTitreInstructions, txtInstructions,
+				txtTitreControles, txtControles);
 
 		panneauTitresEtTextes.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE, null, null)));
 		panneauAPropos.getChildren().add(0, panneauTitresEtTextes);
@@ -513,15 +524,13 @@ public class Controller {
 				if (Main.DEBUG_MODE) System.out.println("Colored");
 			}
 		});
-	}
 
-	protected ContextMenu creeContextMenu() {
-		ctxtMenuListObj.getItems().addAll(ctxtMenuItemEdit, ctxtMenuItemDelete);
-
-		ctxtMenuItemDelete.setOnAction(new EventHandler<ActionEvent>() {
+		lstView.setOnKeyPressed(new EventHandler<KeyEvent>() {
 
 			@Override
-			public void handle(ActionEvent e) {
+			public void handle(KeyEvent e) {
+				if (e.getCode() != KeyCode.DELETE) return;
+
 				for (String s : lstView.getSelectionModel().getSelectedItems()) {
 					// Clean unused data
 					Main.mapSolideNom.get(s).getSolide().removeAll(Main.mapSolideNom.get(s).getSolide());
@@ -547,7 +556,43 @@ public class Controller {
 			}
 
 		});
-		
+	}
+
+	protected ContextMenu creeContextMenu() {
+		ctxtMenuListObj.getItems().addAll(ctxtMenuItemEdit, ctxtMenuItemDelete);
+
+		ctxtMenuItemDelete.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent e) {
+
+				// DUPLICATE de lstView OnDelete Event
+				for (String s : lstView.getSelectionModel().getSelectedItems()) {
+					// Clean unused data
+					Main.mapSolideNom.get(s).getSolide().removeAll(Main.mapSolideNom.get(s).getSolide());
+
+					// Enlève tous les caractères, car ils seront réinitialisés
+					((Pane) Main.root.getCenter()).getChildren().removeAll((Pane) Main.root.getCenter());
+
+					// Enlève le(s) solide(s) de toutes les listes
+					Main.listeSolides.remove(Main.mapSolideNom.get(s));
+					Main.listeNoms.remove(s);
+					Main.mapSolideNom.remove(s);
+					// Set la liste à la nouvelle valeur sans le(s) solide(s)
+					lstView.setItems(Main.listeNoms);
+
+					// Rajoute les solides à la scène
+					Main.update(Main.listeSolides, Color.WHITE);
+
+					System.out.println("lstView : " + lstView.getChildrenUnmodifiable().size());
+					System.out.println("lstNom : " + Main.listeNoms.size());
+					System.out.println("lstSloide : " + Main.listeSolides.size());
+				}
+
+			}
+
+		});
+
 		ctxtMenuItemEdit.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
@@ -566,7 +611,6 @@ public class Controller {
 					e.printStackTrace();
 				}
 
-				
 			}
 		});
 
@@ -587,6 +631,10 @@ public class Controller {
 		}
 		if (txtLar.getText().toCharArray().length == 0) return;
 		for (char c : txtLar.getText().toCharArray()) {
+			if (!Character.isDigit(c) && c != '.') return;
+		}
+		if (txtHau.getText().toCharArray().length == 0) return;
+		for (char c : txtHau.getText().toCharArray()) {
 			if (!Character.isDigit(c) && c != '.') return;
 		}
 		if (txtX.getText().toCharArray().length == 0) return;
@@ -610,7 +658,7 @@ public class Controller {
 			if (Main.DEBUG_MODE) System.out.println("Set ListView");
 		}
 	}
-	
+
 	/**
 	 * Termine le programme.
 	 */
