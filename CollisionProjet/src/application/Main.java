@@ -118,7 +118,7 @@ public class Main extends Application {
 	/**
 	 * Affiche les caractères ASCII du solide sur la scène. Si un solide est dans la
 	 * liste en paramètre, il sera affiché en rouge au lieu de blanc. À utiliser
-	 * pour montrer quels solides sont séléctionnés dans la ListView de la scène
+	 * pour montrer quels solides sont séléctionnés dans la ListView de la scène.
 	 * 
 	 * @param solide - Le ArrayList de tous les solides séléctionnés.
 	 * @param col    - La couleur dans laquelle on veut afficher les solides dans la liste. Les autres seront affichés en blanc.

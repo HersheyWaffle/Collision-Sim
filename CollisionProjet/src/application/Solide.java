@@ -131,7 +131,7 @@ public class Solide {
 	 * @param v            - Le Vector3D duquel nous voulons déterminer le cercle de
 	 *                     vecteurs perpendiculaires.
 	 * @param rayon        - Le rayon du cercle.
-	 * @param arCercle     - L'angle en radians de l'arc du cercle.
+	 * @param arcCercle     - L'angle en radians de l'arc du cercle.
 	 * 
 	 * @return retourne un ArrayList de Vector3D, chacun perpendiculaire au vecteur
 	 *         v.
@@ -147,9 +147,7 @@ public class Solide {
 
 		Vector3d v1 = (Vector3d) v.clone();
 
-		/*
-		 * Calcul l'angle Ramène sur l'axe des z
-		 */
+		//Calcul l'angle Ramène sur l'axe des z
 
 		phi1 = Math.atan2(v1.y, v1.z);
 
@@ -214,7 +212,20 @@ public class Solide {
 
 	}
 
-	/*
+	/**
+	 * Divise le solide en quadrants avec local-sensivity hashing
+	 */
+	public void quadrant() {
+		ArrayList<Vector3d> section = new ArrayList<Vector3d>();
+
+		section.add(new Vector3d(1, 0, 0));
+		section.add(new Vector3d(0, 1, 0));
+		section.add(new Vector3d(0, 0, 1));
+		space = quadrant(section, solide);
+
+	}
+
+	/**
 	 * Indique quel point est dans l'ombre de la lumière
 	 * 
 	 * @param v1 - Le vecteur représentant la source de la lumière
@@ -265,19 +276,6 @@ public class Solide {
 	}
 
 	/**
-	 * Divise le solide en quadrants avec local-sensivity hashing
-	 */
-	public void quadrant() {
-		ArrayList<Vector3d> section = new ArrayList<Vector3d>();
-
-		section.add(new Vector3d(1, 0, 0));
-		section.add(new Vector3d(0, 1, 0));
-		section.add(new Vector3d(0, 0, 1));
-		space = quadrant(section, solide);
-
-	}
-
-	/**
 	 * Enlève les points côte à côte
 	 */
 	public void clean() {
@@ -303,14 +301,19 @@ public class Solide {
 
 	/**
 	 * Calcule le solide à afficher
+	 * 
+	 * @param FONT_SIZE - La taille de police des caractères, ne devrait techniquement pas changer.
 	 */
 	public void render(final int FONT_SIZE) {
 		renderedSolide.clear();
 
 		// copie les points de la sphere dans la rendered sphere
 		for (Point p : solide) {
-			Vector3d v = (Vector3d) p.getCoordonnee().clone();
-
+			Vector3d v = ((Vector3d) p.getCoordonnee().clone());
+			
+			//FIXME Update par bonds au lieu de linéairement
+//			v.scale(Double.valueOf(FONT_SIZE/CONSTANTE_OMBRE));
+			
 			// update to rendering position
 			v.z += virtual_centre.z + Z_CONST;
 
@@ -366,9 +369,11 @@ public class Solide {
 	
 	
 	/**
-	 * Fait tourner le solide 
+	 * Fait tourner le solide sur le centre de la scène.
 	 * 
-	 * @param: thetax, thetay, thetaz en radians
+	 * @param thetax - en radians
+	 * @param thetay - en radians
+	 * @param thetaz - en radians
 	 */
 	public void rotate(double thetax, double thetay, double thetaz) {
 		for (Point p : solide) {
@@ -389,9 +394,6 @@ public class Solide {
 			p.getNorme().sub(virtual_centre);
 			p.getNorme().normalize();
 			p.setRendered(true);
-			
-			
-			
 		}
 		Lumiere.lumiere_Objet(solide);
 	}

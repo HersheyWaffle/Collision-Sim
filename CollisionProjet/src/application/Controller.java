@@ -45,6 +45,7 @@ public class Controller {
 //=========================VARIABLES=========================
 
 	final double ROTATION_ANGLE = Math.PI / 12;
+	final double DEPLACEMENT_CENTRE = 5;
 
 	private Stage stage = new Stage();
 	private ListView<String> lstView;
@@ -52,11 +53,7 @@ public class Controller {
 	// TODO Set contextMenu, moveable obj, resize
 
 	// TODO Option menu set font size
-	private int FONT_SIZE = 10;
-
-	private double centreX = 300;
-	private double centreY = 300;
-	private double centreZ = 0;
+	// private int FONT_SIZE = 10;
 
 	private MenuItem ctxtMenuItemEdit = new MenuItem("Éditer");
 	private MenuItem ctxtMenuItemDelete = new MenuItem("Supprimer");
@@ -89,30 +86,6 @@ public class Controller {
 
 //=========================METHODES=========================
 
-	public double getCentreX() {
-		return centreX;
-	}
-
-	public void setCentreX(double centreX) {
-		this.centreX = centreX;
-	}
-
-	public double getCentreY() {
-		return centreY;
-	}
-
-	public void setCentreY(double centreY) {
-		this.centreY = centreY;
-	}
-
-	public double getCentreZ() {
-		return centreZ;
-	}
-
-	public void setCentreZ(double centreZ) {
-		this.centreZ = centreZ;
-	}
-
 	/**
 	 * Efface tous les objets dans la scène.
 	 * 
@@ -122,23 +95,6 @@ public class Controller {
 	@SuppressWarnings("unchecked")
 	@FXML
 	protected void effaceTout(ActionEvent arg0) {
-
-		panePane.getChildren().removeAll(panePane.getChildren());
-		Main.listeNoms.removeAll(Main.listeNoms);
-		Main.listeSolides.removeAll(Main.listeSolides);
-		Main.mapSolideNom.clear();
-
-		if (lstView == null) {
-			lstView = (ListView<String>) ((VBox) Main.root.getRight()).getChildren().get(1);
-			lstView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-			lstView.setContextMenu(creeContextMenu());
-		}
-
-		lstView.setItems(Main.listeNoms);
-	}
-
-	@SuppressWarnings("unchecked")
-	protected void effaceSolide(ActionEvent arg0) {
 
 		panePane.getChildren().removeAll(panePane.getChildren());
 		Main.listeNoms.removeAll(Main.listeNoms);
@@ -207,81 +163,23 @@ public class Controller {
 	}
 
 	/**
-	 * Affiche la fenêtre de paramètres pour créer un object cubique.
+	 * Affiche la fenêtre de paramètres pour créer un object solide.
 	 * 
-	 * @param arg0 - L'argument du ActionEvent, dans ce cas c'est le bouton Cube.
-	 * @throws IOException
+	 * @param arg0 - L'argument du ActionEvent, dans ce cas c'est le MenuItem du
+	 *             solide séléctionné.
+	 * @throws IOException Dans le cas d'un fichier FXML invalide.
 	 */
 	@FXML
-	protected void showFenetreCube(ActionEvent arg0) throws IOException {
-		URL url = getClass().getResource("FenetreCube.fxml");
+	protected void showFenetreSolide(ActionEvent arg0) throws IOException {
+		URL url = getClass().getResource("Fenetre" + ((MenuItem) arg0.getSource()).getText() + ".fxml");
 		FXMLLoader fxmlLoader = new FXMLLoader(url);
 
 		BorderPane root = fxmlLoader.load();
 		Scene scene = new Scene(root);
 
 		stage.setScene(scene);
-		stage.setTitle("Paramètres du Cube");
-		stage.setResizable(false);
-		stage.show();
-	}
-
-	/**
-	 * Affiche la fenêtre de paramètres pour créer un object sphérique.
-	 * 
-	 * @param arg0 - L'argument du ActionEvent, dans ce cas c'est le bouton Sphère.
-	 * @throws IOException
-	 */
-	@FXML
-	protected void showFenetreSphere(ActionEvent arg0) throws IOException {
-		URL url = getClass().getResource("FenetreSphere.fxml");
-		FXMLLoader fxmlLoader = new FXMLLoader(url);
-
-		BorderPane root = fxmlLoader.load();
-		Scene scene = new Scene(root);
-
-		stage.setScene(scene);
-		stage.setTitle("Paramètres de la Sphère");
-		stage.setResizable(false);
-		stage.show();
-	}
-
-	/**
-	 * Affiche la fenêtre de paramètres pour créer un object sphérique.
-	 * 
-	 * @param arg0 - L'argument du ActionEvent, dans ce cas c'est le bouton Sphère.
-	 * @throws IOException
-	 */
-	@FXML
-	protected void showFenetreCone(ActionEvent arg0) throws IOException {
-		URL url = getClass().getResource("FenetreCone.fxml");
-		FXMLLoader fxmlLoader = new FXMLLoader(url);
-
-		BorderPane root = fxmlLoader.load();
-		Scene scene = new Scene(root);
-
-		stage.setScene(scene);
-		stage.setTitle("Paramètres du Cône");
-		stage.setResizable(false);
-		stage.show();
-	}
-
-	/**
-	 * Affiche la fenêtre de paramètres pour créer un object sphérique.
-	 * 
-	 * @param arg0 - L'argument du ActionEvent, dans ce cas c'est le bouton Sphère.
-	 * @throws IOException
-	 */
-	@FXML
-	protected void showFenetreCylindre(ActionEvent arg0) throws IOException {
-		URL url = getClass().getResource("FenetreCylindre.fxml");
-		FXMLLoader fxmlLoader = new FXMLLoader(url);
-
-		BorderPane root = fxmlLoader.load();
-		Scene scene = new Scene(root);
-
-		stage.setScene(scene);
-		stage.setTitle("Paramètres dy Cylindre");
+		stage.setTitle("Paramètres du " + ((MenuItem) arg0.getSource()).getText());
+		if (((MenuItem) arg0.getSource()).getText().equals("Sphere")) stage.setTitle("Paramètres de la Sphère");
 		stage.setResizable(false);
 		stage.show();
 	}
@@ -315,6 +213,7 @@ public class Controller {
 			if (!Character.isDigit(c) && c != '.' && c != '-') return;
 		}
 
+		// Initialise la ListView des solides si ceci n'a pas déjà été fait
 		if (lstView == null) {
 			lstView = (ListView<String>) ((VBox) Main.root.getRight()).getChildren().get(1);
 			lstView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -342,7 +241,7 @@ public class Controller {
 			}
 
 			Cube cube = new Cube(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()),
-					Double.valueOf(txtHau.getText()), FONT_SIZE);
+					Double.valueOf(txtHau.getText()), Main.FONT_SIZE);
 
 			cube.virtual_centre = new Vector3d(Double.valueOf(txtX.getText()), Double.valueOf(txtY.getText()),
 					Double.valueOf(txtZ.getText()));
@@ -358,7 +257,8 @@ public class Controller {
 //					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
 		}
 		else if (txtTitreParam.getText().toLowerCase().contains("sphère")) {
-			Sphere sphere = new Sphere(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()), FONT_SIZE);
+			Sphere sphere = new Sphere(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()),
+					Main.FONT_SIZE);
 
 			sphere.virtual_centre = new Vector3d(Double.valueOf(txtX.getText()), Double.valueOf(txtY.getText()),
 					Double.valueOf(txtZ.getText()));
@@ -374,7 +274,7 @@ public class Controller {
 //					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
 		}
 		else if (txtTitreParam.getText().toLowerCase().contains("cône")) {
-			Cone cone = new Cone(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()), FONT_SIZE);
+			Cone cone = new Cone(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()), Main.FONT_SIZE);
 
 			cone.virtual_centre = new Vector3d(Double.valueOf(txtX.getText()), Double.valueOf(txtY.getText()),
 					Double.valueOf(txtZ.getText()));
@@ -391,7 +291,7 @@ public class Controller {
 		}
 		else if (txtTitreParam.getText().toLowerCase().contains("cylindre")) {
 			Cylindre cylindre = new Cylindre(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()),
-					FONT_SIZE);
+					Main.FONT_SIZE);
 
 			cylindre.virtual_centre = new Vector3d(Double.valueOf(txtX.getText()), Double.valueOf(txtY.getText()),
 					Double.valueOf(txtZ.getText()));
@@ -449,52 +349,75 @@ public class Controller {
 					if (arg0.getCode() == KeyCode.X) {
 						tousSolides.rotate(ROTATION_ANGLE * posNeg, 0, 0);
 						Main.update(Main.listeSolides, Color.WHITE);
+						
 						if (Main.DEBUG_MODE) System.out.println("x");
 					}
 					else if (arg0.getCode() == KeyCode.C) {
 						tousSolides.rotate(0, ROTATION_ANGLE * posNeg, 0);
 						Main.update(Main.listeSolides, Color.WHITE);
+						
 						if (Main.DEBUG_MODE) System.out.println("y");
 					}
 					else if (arg0.getCode() == KeyCode.Z) {
 						tousSolides.rotate(0, 0, ROTATION_ANGLE * posNeg);
 						Main.update(Main.listeSolides, Color.WHITE);
+						
 						if (Main.DEBUG_MODE) System.out.println("z");
 					}
-					else if (arg0.getCode() == KeyCode.UP) {
-						tousSolides.deplacement(new Vector3d(0, -5, 0));
-						Main.update(Main.listeSolides, Color.WHITE);
-					}
-					else if (arg0.getCode() == KeyCode.DOWN) {
-						tousSolides.deplacement(new Vector3d(0, 5, 0));
-						Main.update(Main.listeSolides, Color.WHITE);
-					}
-					else if (arg0.getCode() == KeyCode.LEFT) {
-						tousSolides.deplacement(new Vector3d(-5, 0, 0));
-						Main.update(Main.listeSolides, Color.WHITE);
-
-					}
-					else if (arg0.getCode() == KeyCode.RIGHT) {
-						tousSolides.deplacement(new Vector3d(5, 0, 0));
-						Main.update(Main.listeSolides, Color.WHITE);
-					}
-					else if (arg0.getCode() == KeyCode.W) {
-						tousSolides.deplacement(new Vector3d(0, 0, 5));
-						Main.update(Main.listeSolides, Color.WHITE);
-					}
-					else if (arg0.getCode() == KeyCode.S) {
-						tousSolides.deplacement(new Vector3d(0, 0, -5));
-						Main.update(Main.listeSolides, Color.WHITE);
-					}
 					else {
-						return;
+						break;
 					}
 				}
 
-				// LEGACY CODE
+				if (arg0.getCode() == KeyCode.UP) {
+					Main.rendering_centre.add(new Vector3d(0, -DEPLACEMENT_CENTRE, 0));
+					Main.update(Main.listeSolides, Color.WHITE);
+					
+					if (Main.DEBUG_MODE) System.out.println("^");
+				}
+				else if (arg0.getCode() == KeyCode.DOWN) {
+					Main.rendering_centre.add(new Vector3d(0, DEPLACEMENT_CENTRE, 0));
+					Main.update(Main.listeSolides, Color.WHITE);
+					
+					if (Main.DEBUG_MODE) System.out.println("v");
+				}
+				else if (arg0.getCode() == KeyCode.LEFT) {
+					Main.rendering_centre.add(new Vector3d(-DEPLACEMENT_CENTRE, 0, 0));
+					Main.update(Main.listeSolides, Color.WHITE);
+					
+					if (Main.DEBUG_MODE) System.out.println("<");
+				}
+				else if (arg0.getCode() == KeyCode.RIGHT) {
+					Main.rendering_centre.add(new Vector3d(DEPLACEMENT_CENTRE, 0, 0));
+					Main.update(Main.listeSolides, Color.WHITE);
+					
+					if (Main.DEBUG_MODE) System.out.println(">");
+				}
+				else if (arg0.getCode() == KeyCode.W) {
+					// FIXME Ne fait pas de zoom, augmente seulement la taille de police au lieu de
+					// faire augmenter la taille de la forme
+					Main.FONT_SIZE += 1;
+					Main.rendering_centre.add(new Vector3d(0, 0, DEPLACEMENT_CENTRE));
+					Main.update(Main.listeSolides, Color.WHITE);
+					
+					if (Main.DEBUG_MODE) System.out.println("w");
+				}
+				else if (arg0.getCode() == KeyCode.S) {
+					// FIXME
+					if (Main.FONT_SIZE > 1) Main.FONT_SIZE -= 1;
+					Main.rendering_centre.add(new Vector3d(0, 0, -DEPLACEMENT_CENTRE));
+					Main.update(Main.listeSolides, Color.WHITE);
+					
+					if (Main.DEBUG_MODE) System.out.println("s");
+				}
+				else {
+					return;
+				}
+			}
+
+			// LEGACY CODE
 //				pane.getChildren().removeAll(pane.getChildren());
 //				Solide.creeForme(tousPoints, pane, 0, 0, 0);
-			}
 		};
 	}
 
@@ -657,6 +580,8 @@ public class Controller {
 
 			if (Main.DEBUG_MODE) System.out.println("Set ListView");
 		}
+		
+		//TODO Edit le solide
 	}
 
 	/**

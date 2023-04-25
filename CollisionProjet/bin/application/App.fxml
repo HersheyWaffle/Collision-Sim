@@ -24,14 +24,14 @@
               <MenuItem mnemonicParsing="false" onAction="#quitter" text="Quitter" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Editition">
+          <Menu mnemonicParsing="false" text="Éditition">
             <items>
                   <Menu mnemonicParsing="false" text="Ajouter une forme">
                     <items>
-                      <MenuItem mnemonicParsing="false" onAction="#showFenetreSphere" text="Sphère" />
-                        <MenuItem mnemonicParsing="false" onAction="#showFenetreCube" text="Cube" />
-                        <MenuItem mnemonicParsing="false" onAction="#showFenetreCylindre" text="Cylindre" />
-                        <MenuItem mnemonicParsing="false" onAction="#showFenetreCone" text="Cône" />
+                      <MenuItem mnemonicParsing="false" onAction="#showFenetreSolide" text="Sphere" />
+                        <MenuItem mnemonicParsing="false" onAction="#showFenetreSolide" text="Cube" />
+                        <MenuItem mnemonicParsing="false" onAction="#showFenetreSolide" text="Cylindre" />
+                        <MenuItem mnemonicParsing="false" onAction="#showFenetreSolide" text="Cone" />
                     </items>
                   </Menu>
                   <SeparatorMenuItem mnemonicParsing="false" />
