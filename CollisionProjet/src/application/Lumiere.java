@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import javax.vecmath.Vector3d;
 
 /**
- * Classe utilitaire qui g�re l'affichage de la lumi�re dans la sc�ne.
+ * Classe utilitaire qui gère l'affichage de la lumière dans la scène.
  * 
  * @version 1.0.1 2023-03-22
  * @author Abel-Jimmy Oyono-Montoki
@@ -30,7 +30,13 @@ public class Lumiere {
 	}
 	*/
 
-	public static void ombre_Objet(ArrayList<Point> objet) {
+	/**
+	 * Détermine si les points du solide sont ombragés à l'aide du z-buffer.
+	 * 
+	 * @param objet - La liste de points du solide sur lequel on veut effectuer le
+	 *              calcul
+	 */
+	public static void ombreObjet(ArrayList<Point> objet) {
 		ArrayList<Vector3d> section = Solide.cerclePerpendiculaire(Math.PI / 5, source, 1, Math.PI);
 		ArrayList<ArrayList<Point>> ensemble = Solide.quadrant(section, objet);
 
@@ -39,7 +45,13 @@ public class Lumiere {
 		}
 	}
 
-	public static void lumiere_Objet(ArrayList<Point> objet) {
+	/**
+	 * Définit le niveau de luminosité de chaque point du solide.
+	 * 
+	 * @param objet - La liste de points du solide sur lequel on veut effectuer le
+	 *              calcul
+	 */
+	public static void lumiereObjet(ArrayList<Point> objet) {
 		source.normalize();
 		for (Point n : objet) {
 			n.getNorme().normalize();

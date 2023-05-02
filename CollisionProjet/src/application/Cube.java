@@ -31,21 +31,21 @@ public class Cube extends Solide {
 	 * @param longueur  - La longueur du cube.
 	 * @param largeur   - La largeur du cube.
 	 * @param hauteur   - La hauteur du cube.
-	 * @param FONT_SIZE - taille des caractères
+	 * @param fontSize - taille des caractï¿½res
 	 */
-	public Cube(double longueur, double largeur, double hauteur, final int FONT_SIZE) {
+	public Cube(double longueur, double largeur, double hauteur, int fontSize) {
+		super.setFontSize(fontSize);
 		nbrPointsLongueur = longueur;
 		nbrPointsLargeur = largeur;
 		nbrPointsHauteur = hauteur;
-
-		virtual_centre = new Vector3d(0, 0, 0);
+		virtualCentre = new Vector3d(0, 0, 0);
 		setCarre();
 		setCube();
 		Solide.enleveDoublons(getCube());
 
 		quadrant();
 		clean();
-		render(FONT_SIZE);
+		render(super.getFontSize());
 		setSolide(cube);
 	}
 
@@ -71,7 +71,7 @@ public class Cube extends Solide {
 		return nbrPointsHauteur;
 	}
 
-	public void setLongueur(double longueur) { // TODO Fonction pour changer les dimensions du cube
+	public void setLongueur(double longueur) {
 		nbrPointsLongueur = longueur;
 	}
 

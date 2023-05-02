@@ -6,6 +6,7 @@
 <ContextMenu fx:id="ctxtMenu" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
   <items>
     <MenuItem fx:id="ctxtMenuEdit" mnemonicParsing="false" text="Éditer" />
-      <MenuItem fx:id="ctxtMenuDelete" mnemonicParsing="false" text="Supprimer" />
+    <MenuItem fx:id="ctxtMenuCombine" mnemonicParsing="false" text="Combiner" />
+    <MenuItem fx:id="ctxtMenuDelete" mnemonicParsing="false" text="Supprimer" />
   </items>
 </ContextMenu>

@@ -12,7 +12,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 /**
- * Classe utilitaire avec des fonctions génériques pour traiter les objets.
+ * Classe utilitaire avec des fonctions gÃ©nÃ©riques pour traiter les objets.
  * 
  * @version 1.4.0 2023-03-08
  * @author Omar Ghazaly, Abel-Jimmy Oyono-Montoki
@@ -21,12 +21,13 @@ public class Solide {
 
 //=========================VARIABLES=========================	
 
-	Vector3d virtual_centre = new Vector3d(0, 0, 0);
+	Vector3d virtualCentre = new Vector3d(0, 0, 0);
 	static Matrix3d rotation = new Matrix3d();
 
 	final double Z_CONST = 400;
 	final static int CONSTANTE_OMBRE = 10;
 	final double ESPACE_ENTRE_POINT = 1;
+	int fontSize = 10;
 
 	private ArrayList<Point> solide = new ArrayList<Point>();
 	ArrayList<Point> renderedSolide = new ArrayList<Point>();
@@ -36,12 +37,12 @@ public class Solide {
 //=========================METHODES=========================	
 
 	/**
-	 * Déplace le centre du solide
+	 * DÃ©place le centre du solide
 	 * 
-	 * @param dv -le déplaceement
+	 * @param dv -le dÃ©placeement
 	 */
 	public void deplacement(Vector3d dv) {
-		virtual_centre.add(dv);
+		virtualCentre.add(dv);
 	}
 
 	/**
@@ -73,7 +74,21 @@ public class Solide {
 	}
 
 	/**
-	 * Enlève les points posés à la même position.
+	 * @return the fontSize
+	 */
+	public int getFontSize() {
+		return fontSize;
+	}
+
+	/**
+	 * @param fontSize the fontSize to set
+	 */
+	public void setFontSize(int fontSize) {
+		this.fontSize = fontSize;
+	}
+
+	/**
+	 * EnlÃ¨ve les points posÃ©s Ã  la mÃªme position.
 	 * 
 	 * @param solide - Le ArrayList des points du solide
 	 */
@@ -93,10 +108,10 @@ public class Solide {
 	}
 
 	/**
-	 * Retourne un vecteur perpendiculaire au vecteur en paramètre. Si le vecteur
+	 * Retourne un vecteur perpendiculaire au vecteur en paramÃ¨tre. Si le vecteur
 	 * est nul, retourne le vecteur (1, 0, 0)
 	 * 
-	 * @param v - Le Vector3D duquel nous voulons déterminer le vecteur
+	 * @param v - Le Vector3D duquel nous voulons dÃ©terminer le vecteur
 	 *          perpendiculaire correspondant
 	 * 
 	 * @return retourne un Vector3D perpendiculaire au vecteur v.
@@ -125,10 +140,10 @@ public class Solide {
 
 	/**
 	 * Retourne un ArrayList d'un cercle de points dont les vecteurs sont
-	 * perpendiculaires au vecteur en paramètre.
+	 * perpendiculaires au vecteur en paramÃ¨tre.
 	 * 
 	 * @param dThetaCercle - Angle en Rad entre chaque point dans le cercle
-	 * @param v            - Le Vector3D duquel nous voulons déterminer le cercle de
+	 * @param v            - Le Vector3D duquel nous voulons dÃ©terminer le cercle de
 	 *                     vecteurs perpendiculaires.
 	 * @param rayon        - Le rayon du cercle.
 	 * @param arcCercle     - L'angle en radians de l'arc du cercle.
@@ -147,7 +162,7 @@ public class Solide {
 
 		Vector3d v1 = (Vector3d) v.clone();
 
-		//Calcul l'angle Ramène sur l'axe des z
+		//Calcul l'angle RamÃ¨ne sur l'axe des z
 
 		phi1 = Math.atan2(v1.y, v1.z);
 
@@ -160,7 +175,7 @@ public class Solide {
 		do {
 			Vector3d initial = new Vector3d(0, 0, rayon);
 
-			// crée le cercle autour de l'axe des x
+			// crï¿½e le cercle autour de l'axe des x
 			rotation.rotX(theta);
 			rotation.transform(initial);
 
@@ -180,10 +195,10 @@ public class Solide {
 	}
 
 	/**
-	 * Retourne un ArrayList du Array List des points du solide, divisés selon les quadrants.
+	 * Retourne un ArrayList du Array List des points du solide, divisÃ©s selon les quadrants.
 	 * 
-	 * @param section - Le Array List de tous les vecteurs représentant les quadrants de la carte
-	 * @param objet - Le solide représenté par une liste de points
+	 * @param section - Le Array List de tous les vecteurs reprÃ©sentant les quadrants de la carte
+	 * @param objet - Le solide reprÃ©sentÃ© par une liste de points
 	 */
 	public static ArrayList<ArrayList<Point>> quadrant(ArrayList<Vector3d> section, ArrayList<Point> objet) {
 
@@ -226,10 +241,10 @@ public class Solide {
 	}
 
 	/**
-	 * Indique quel point est dans l'ombre de la lumière
+	 * Indique quel point est dans l'ombre de la lumiÃ¨re
 	 * 
-	 * @param v1 - Le vecteur représentant la source de la lumière
-	 * @param objet - La liste de points représentant le solide.
+	 * @param v1 - Le vecteur reprÃ©sentant la source de la lumiÃ¨re
+	 * @param objet - La liste de points reprÃ©sentant le solide.
 	 */
 	public static void vBuffer(Vector3d v1, ArrayList<Point> objet) {
 		v1.normalize();
@@ -276,7 +291,7 @@ public class Solide {
 	}
 
 	/**
-	 * Enlève les points côte à côte
+	 * EnlÃ¨ve les points cÃ´te Ã  cÃ´te
 	 */
 	public void clean() {
 		solide.clear();
@@ -300,32 +315,31 @@ public class Solide {
 	}
 
 	/**
-	 * Calcule le solide à afficher
+	 * Calcule le solide Ã  afficher
 	 * 
-	 * @param FONT_SIZE - La taille de police des caractères, ne devrait techniquement pas changer.
+	 * @param FONT_SIZE - La taille de police des caractÃ¨res, ne devrait techniquement pas changer.
 	 */
 	public void render(final int FONT_SIZE) {
 		renderedSolide.clear();
 
+		this.fontSize = (int) ((Z_CONST * FONT_SIZE) / (Z_CONST + virtualCentre.z));
+		
 		// copie les points de la sphere dans la rendered sphere
 		for (Point p : solide) {
 			Vector3d v = ((Vector3d) p.getCoordonnee().clone());
 			
-			//FIXME Update par bonds au lieu de linéairement
-//			v.scale(Double.valueOf(FONT_SIZE/CONSTANTE_OMBRE));
-			
 			// update to rendering position
-			v.z += virtual_centre.z + Z_CONST;
+			v.z += virtualCentre.z + Z_CONST;
 
 			v.x *= (Z_CONST) / (v.z);
 			v.y *= (Z_CONST) / (v.z);
 
 			//
-			v.x += (virtual_centre.x * Z_CONST) / (virtual_centre.z + Z_CONST);
-			v.y += (virtual_centre.y * Z_CONST) / (virtual_centre.z + Z_CONST);
+			v.x += (virtualCentre.x * Z_CONST) / (virtualCentre.z + Z_CONST);
+			v.y += (virtualCentre.y * Z_CONST) / (virtualCentre.z + Z_CONST);
 
-			v.x = ((int) v.x / FONT_SIZE) * FONT_SIZE;
-			v.y = ((int) v.y / FONT_SIZE) * FONT_SIZE;
+			v.x = ((int) v.x / this.fontSize) * this.fontSize;
+			v.y = ((int) v.y / this.fontSize) * this.fontSize;
 
 			Point renderedPoint = new Point(v, new Vector3d());
 			renderedPoint.setEclairage(p.getEclairage());
@@ -356,7 +370,7 @@ public class Solide {
 				}
 			}
 		}
-		Lumiere.ombre_Objet(renderedSolide);
+		Lumiere.ombreObjet(renderedSolide);
 
 		// to clean renderSphere
 		for (int i = 0; i < renderedSolide.size(); i++) {
@@ -369,16 +383,23 @@ public class Solide {
 	
 	
 	/**
-	 * Fait tourner le solide sur le centre de la scène.
+	 * Fait tourner le solide sur le centre de la scÃ¨ne.
 	 * 
 	 * @param thetax - en radians
 	 * @param thetay - en radians
 	 * @param thetaz - en radians
 	 */
 	public void rotate(double thetax, double thetay, double thetaz) {
+		rotation.rotX(thetax);
+		rotation.transform(virtualCentre);
+		rotation.rotY(thetay);
+		rotation.transform(virtualCentre);
+		rotation.rotZ(thetaz);
+		rotation.transform(virtualCentre);
+		
 		for (Point p : solide) {
-			p.getCoordonnee().add(virtual_centre);
-			p.getNorme().add(virtual_centre);
+//			p.getCoordonnee().add(virtual_centre);
+//			p.getNorme().add(virtual_centre);
 			
 			rotation.rotX(thetax);
 			rotation.transform(p.getCoordonnee());
@@ -390,16 +411,42 @@ public class Solide {
 			rotation.transform(p.getCoordonnee());
 			rotation.transform(p.getNorme());
 			
-			p.getCoordonnee().sub(virtual_centre);
-			p.getNorme().sub(virtual_centre);
+//			p.getCoordonnee().sub(virtual_centre);
+//			p.getNorme().sub(virtual_centre);
 			p.getNorme().normalize();
 			p.setRendered(true);
 		}
-		Lumiere.lumiere_Objet(solide);
+		Lumiere.lumiereObjet(solide);
+	}
+	
+	/**
+	 * Fait tourner le solide autour de lui-mÃªme.
+	 * 
+	 * @param thetax - en radians
+	 * @param thetay - en radians
+	 * @param thetaz - en radians
+	 */
+	public void rotateSelf(double thetax, double thetay, double thetaz) {
+		for (Point p : solide) {
+			
+			rotation.rotX(thetax);
+			rotation.transform(p.getCoordonnee());
+			rotation.transform(p.getNorme());
+			rotation.rotY(thetay);
+			rotation.transform(p.getCoordonnee());
+			rotation.transform(p.getNorme());
+			rotation.rotZ(thetaz);
+			rotation.transform(p.getCoordonnee());
+			rotation.transform(p.getNorme());
+			
+			p.getNorme().normalize();
+			p.setRendered(true);
+		}
+		Lumiere.lumiereObjet(solide);
 	}
 
 	/**
-	 * Génère les points d'un solide en effectuant une rotation sur un plan.
+	 * Gï¿½nï¿½re les points d'un solide en effectuant une rotation sur un plan.
 	 * 
 	 * @param dThetaCercle - Angle en Rad entre chaque point dans le cercle
 	 * @param plan         - La liste de tous les points du plan qui va former le
@@ -407,7 +454,7 @@ public class Solide {
 	 * @param solide       - La liste de tous les points du solide.
 	 */
 	public static void setFormeRotation(double dThetaCercle, ArrayList<Point> plan, ArrayList<Point> solide) {
-		Matrix3d rotation = new Matrix3d(); // Matrice 3D servant à effectuer la rotation des points et des cercles
+		Matrix3d rotation = new Matrix3d(); // Matrice 3D servant ï¿½ effectuer la rotation des points et des cercles
 		Vector3d u = new Vector3d();
 
 		double theta = 0;
@@ -426,7 +473,7 @@ public class Solide {
 	}
 	
 	/**
-	 * Effectue une rotation sur le solide. Les paramètres sont en DEGRÉS
+	 * Effectue une rotation sur le solide. Les paramï¿½tres sont en DEGRï¿½S
 	 * 
 	 * @param solide - Le solide sur lequel on effectue la rotation
 	 * @param rotX   - Rotation sur l'axe des X
@@ -437,7 +484,7 @@ public class Solide {
 	@Deprecated
 	public static void rotateSolide(ArrayList<Point> solide, double rotX, double rotY, double rotZ, double posX,
 			double posY, double posZ) {
-		Matrix3d rotation = new Matrix3d(); // Matrice 3D servant à effectuer la rotation des points et des plans
+		Matrix3d rotation = new Matrix3d(); // Matrice 3D servant ï¿½ effectuer la rotation des points et des plans
 
 		for (Point v : solide) {
 			if (rotX != 0) {

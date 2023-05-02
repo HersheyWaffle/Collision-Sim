@@ -20,7 +20,7 @@ public class Sphere extends Solide {
 	private double rayon; // Rayon du cercle
 	private double decalage; // Decalage du cercle de son origine, pour former un tore
 	private double dThetaCercle; // Angle en Rad entre chaque point dans le cercle
-
+	
 	private ArrayList<Point> cercle = new ArrayList<Point>(); // Liste des vecteurs 3D de chaque point dans le
 																	// cercle
 	private ArrayList<Point> sphere = new ArrayList<Point>(); // Liste des listes des vecteurs 3D de chaque point
@@ -33,21 +33,22 @@ public class Sphere extends Solide {
 	 * 
 	 * @param rayon    - Le rayon de la sphere
 	 * @param decalage - Le decalage du cercle. Va former un Tore.
-	 * @param FONT_SIZE - taille des caractères
+	 * @param fontSize - taille des caractères
 	 */
-	public Sphere(double rayon, double decalage, final int FONT_SIZE) {
+	public Sphere(double rayon, double decalage, int fontSize) {
+		super.setFontSize(fontSize);
 		this.rayon = rayon;
 		this.decalage = decalage;
 		dThetaCercle = 2 * Math.PI / (rayon / ESPACE_ENTRE_POINTS);
 
-		virtual_centre = new Vector3d(0, 0, 0);
+		virtualCentre = new Vector3d(0, 0, 0);
 		setCercle();
 		Solide.setFormeRotation(dThetaCercle, cercle, sphere);
 		Solide.enleveDoublons(getSphere());
 
 		quadrant();
 		clean();
-		render(FONT_SIZE);
+		render(super.getFontSize());
 		setSolide(sphere);
 	}
 

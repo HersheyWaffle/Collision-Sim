@@ -3,9 +3,9 @@ package application;
 import javax.vecmath.Vector3d;
 
 /**
- * Classe Vecteur avec plus d'information que Vector3D ne fournit pas. Utilisé
+ * Classe Vecteur avec plus d'information que Vector3D ne fournit pas. UtilisÃ©
  * entre autre pour calculer la norme des points dans les solides pour pouvoir
- * effectuer le calcul d'ombre de la lumière.
+ * effectuer le calcul d'ombre de la lumiÃ¨re.
  * 
  * @version 1.0.1 2023-03-22
  * @author Abel-Jimmy Oyono-Montoki
@@ -14,20 +14,20 @@ public class Point {
 
 //=========================VARIABLES=========================	
 
-	private Vector3d coordonnee; // Vector3D des coordonnées du point
+	private Vector3d coordonnee; // Vector3D des coordonnÃ©es du point
 	private Vector3d norme; // Vector3D de la norme du point
-	private Vector3d shadow; // Vector3D résultant de l'ombre projetée par un point
-	private String eclairage; // Caractère représentant le niveau de luminosité d'un point ".,-~:;=!*#$@"
-	private String quadrant; // String représentant la région dans laquelle se trouve le point. Définit par
-								// une séquence de 0 et de 1, représentant les coordonnées du quadrant
-	private boolean isRendered; // Détermine si le point sera rendered sur l'écran
+	private Vector3d shadow; // Vector3D rÃ©sultant de l'ombre projetï¿½e par un point
+	private String eclairage; // CaractÃ¨re reprÃ©sentant le niveau de luminositï¿½ d'un point ".,-~:;=!*#$@"
+	private String quadrant; // String reprÃ©sentant la rÃ©gion dans laquelle se trouve le point. DÃ©finit par
+								// une sÃ©quence de 0 et de 1, reprÃ©sentant les coordonnÃ©es du quadrant
+	private boolean isRendered; // DÃ©termine si le point sera rendered sur l'Ã©cran
 
 //=========================CONSTRUCTEUR=======================		
 
 	/**
 	 * Objet Point.
 	 * 
-	 * @param coordonnee - Le Vector3D des coordonnées du point.
+	 * @param coordonnee - Le Vector3D des coordonnÃ©es du point.
 	 * @param norme      - Le Vector3D de la norme du point.
 	 */
 	public Point(Vector3d coordonnee, Vector3d norme) {
@@ -46,7 +46,7 @@ public class Point {
 //=========================METHODES=========================	
 
 	/**
-	 * Retourne le Vector3D qui représente les coordonnées du point.
+	 * Retourne le Vector3D qui reprÃ©sente les coordonnÃ©es du point.
 	 * 
 	 * @return retourne un vecteurs 3D indiquant la position 3D du point.
 	 */
@@ -55,7 +55,7 @@ public class Point {
 	}
 
 	/**
-	 * Définit la valeur du Vector3D des coordonnées du point.
+	 * Dï¿½finit la valeur du Vector3D des coordonnÃ©es du point.
 	 * 
 	 * @param coordonnee - Le vecteurs 3D indiquant la position 3D du point.
 	 */
@@ -64,7 +64,7 @@ public class Point {
 	}
 
 	/**
-	 * Retourne le Vector3D qui représente la Norme.
+	 * Retourne le Vector3D qui reprÃ©sente la Norme.
 	 * 
 	 * @return retourne un vecteurs 3D indiquant la position 3D de la norme du
 	 *         point.
@@ -74,7 +74,7 @@ public class Point {
 	}
 
 	/**
-	 * Définit la valeur du Vector3Dqui représente la Norme du point.
+	 * Dï¿½finit la valeur du Vector3Dqui reprÃ©sente la Norme du point.
 	 * 
 	 * @param norme - Le vecteurs 3D indiquant la position 3D de la norme du point.
 	 */
@@ -83,7 +83,7 @@ public class Point {
 	}
 
 	/**
-	 * Retourne le Vector3D qui représente le Shadow.
+	 * Retourne le Vector3D qui reprÃ©sente le Shadow.
 	 * 
 	 * @return retourne un vecteurs 3D indiquant la position 3D du point Shadow.
 	 */
@@ -92,7 +92,7 @@ public class Point {
 	}
 
 	/**
-	 * Définit la valeur du Vector3D du point Shadow.
+	 * DÃ©finit la valeur du Vector3D du point Shadow.
 	 * 
 	 * @param shadow - Le vecteur 3d du point Shadow.
 	 */
@@ -101,19 +101,19 @@ public class Point {
 	}
 
 	/**
-	 * Retourne le caractère représentant le degré de luminosité du point. Les 12
+	 * Retourne le caractÃ¨re reprï¿½sentant le degrÃ© de luminositÃ© du point. Les 12
 	 * niveaux sont ".,-~:;=!*#$@"
 	 * 
-	 * @return retourne un String indiquant le degré de luminosité du point.
+	 * @return retourne un String indiquant le degrÃ© de luminositÃ© du point.
 	 */
 	public String getEclairage() {
 		return eclairage;
 	}
 
 	/**
-	 * Définit la valeur de l'éclairage.
+	 * Dï¿½finit la valeur de l'Ã©clairage.
 	 * 
-	 * @param eclairage - Le String représentant le degré d'éclairage du point.
+	 * @param eclairage - Le String reprÃ©sentant le degrÃ© d'Ã©clairage du point.
 	 *                  Valeurs possibles: ".,-~:;=!*#$@"
 	 */
 	public void setEclairage(String eclairage) {
@@ -121,17 +121,17 @@ public class Point {
 	}
 
 	/**
-	 * Définit la valeur du quadrant.
+	 * DÃ©finit la valeur du quadrant.
 	 * 
-	 * @param s - Le String représentant le nouveau quadrant. Définit par une
-	 *          séquence de 0 et de 1, représentant les coordonnées du quadrant
+	 * @param s - Le String reprÃ©sentant le nouveau quadrant. DÃ©finit par une
+	 *          sÃ©quence de 0 et de 1, reprÃ©sentant les coordonnÃ©es du quadrant
 	 */
 	public void addQuadrant(String s) {
 		quadrant += s;
 	}
 
 	/**
-	 * Efface le quadrant, le redéfinissant en tant qu'espace vide.
+	 * Efface le quadrant, le redÃ©finissant en tant qu'espace vide.
 	 */
 	public void clearQuadrant() {
 		quadrant = new String();
@@ -147,7 +147,7 @@ public class Point {
 	}
 
 	/**
-	 * Vérifie si le point doit être rendered.
+	 * VÃ©rifie si le point doit Ãªtre rendered.
 	 * 
 	 * @return retourne un Boolean indiquant si le point sera rendered ou non.
 	 */
@@ -156,7 +156,7 @@ public class Point {
 	}
 
 	/**
-	 * Définit si le point doit être rendered.
+	 * Dï¿½finit si le point doit Ãªtre rendered.
 	 * 
 	 * @param isRendered - Le Boolean indiquant si le point sera rendered ou non.
 	 */
@@ -171,5 +171,4 @@ public class Point {
 	public String toString() {
 		return String.format("X: %f Y: %f Z:%f\nEclairage:", coordonnee.x, coordonnee.y, coordonnee.z, eclairage);
 	}
-
 }

@@ -31,21 +31,22 @@ public class Cylindre extends Solide {
 	 * 
 	 * @param rayon   - Le rayon du cylindre.
 	 * @param hauteur - La hauteur du cylindre.
-	 * @param FONT_SIZE - taille des caractères
+	 * @param fontSize - taille des caractï¿½res
 	 */
-	public Cylindre(double rayon, double hauteur, final int FONT_SIZE) {
+	public Cylindre(double rayon, double hauteur, final int fontSize) {
+		super.setFontSize(fontSize);
 		this.rayon = rayon;
 		this.hauteur = hauteur;
 		dThetaCercle = 2 * Math.PI / (2 * rayon / ESPACE_ENTRE_POINTS);
 
-		virtual_centre = new Vector3d(0, 0, 0);
+		virtualCentre = new Vector3d(0, 0, 0);
 		setCarre();
 		Solide.setFormeRotation(dThetaCercle, carre, cylindre);
 		Solide.enleveDoublons(getCylindre());
 
 		quadrant();
 		clean();
-		render(FONT_SIZE);
+		render(super.getFontSize());
 		setSolide(cylindre);
 	}
 
@@ -82,7 +83,7 @@ public class Cylindre extends Solide {
 				if (y >= hauteur || y <= -hauteur || z >= rayon || z <= -rayon) {
 					Vector3d temp = new Vector3d(0, 0, 0);
 					Vector3d u = new Vector3d(0, y, z);
-					temp = getPerpendicular(u); // SUS C'est ça la norme?
+					temp = getPerpendicular(u); // SUS C'est Ã§a la norme?
 					carre.add(new Point(u, temp));
 				}
 			}

@@ -31,21 +31,22 @@ public class Cone extends Solide {
 	 * 
 	 * @param rayon   - Le rayon du cylindre.
 	 * @param hauteur - La hauteur du cylindre.
-	 * @param FONT_SIZE - taille des caractères
+	 * @param fontSize - taille des caractï¿½res
 	 */
-	public Cone(double rayon, double hauteur, final int FONT_SIZE) {
+	public Cone(double rayon, double hauteur, final int fontSize) {
+		super.setFontSize(fontSize);
 		this.rayon = rayon;
 		this.hauteur = hauteur;
 		dThetaCercle = 2 * Math.PI / (2 * rayon / ESPACE_ENTRE_POINTS);
 
-		virtual_centre = new Vector3d(0, 0, 0);
+		virtualCentre = new Vector3d(0, 0, 0);
 		setTriangle();
 		Solide.setFormeRotation(dThetaCercle, triangle, cone);
 		Solide.enleveDoublons(getCone());
 
 		quadrant();
 		clean();
-		render(FONT_SIZE);
+		render(super.getFontSize());
 		setSolide(cone);
 	}
 
@@ -83,11 +84,11 @@ public class Cone extends Solide {
 			Vector3d temp = new Vector3d(0, 0, 0);
 
 			Vector3d u = new Vector3d(0, 0, y);
-			temp = getPerpendicular(u); // SUS C'est ça la norme?
+			temp = getPerpendicular(u); // SUS C'est Ã§a la norme?
 			triangle.add(new Point(u, temp));
 
 			Vector3d v = new Vector3d(0, z, y);
-			temp = getPerpendicular(v); // SUS C'est ça la norme?
+			temp = getPerpendicular(v); // SUS C'est Ã§a la norme?
 			triangle.add(new Point(v, temp));
 		}
 	}

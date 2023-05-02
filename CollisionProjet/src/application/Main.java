@@ -30,22 +30,22 @@ public class Main extends Application {
 
 	public static BorderPane root;
 	/**
-	 * La ObservableList des solides dans la scène
+	 * La ObservableList des solides dans la scÃ¨ne
 	 */
 	public static ObservableList<Solide> listeSolides = FXCollections.observableArrayList();
 	/**
-	 * La ObservableList des string représentant le nom des Solides, Doit être
-	 * unique, car utilisé pour le hashmap qui les lie ensemble
+	 * La ObservableList des string reprÃ©sentant le nom des Solides, Doit Ãªtre
+	 * unique, car utilisÃ© pour le hashmap qui les lie ensemble
 	 */
 	public static ObservableList<String> listeNoms = FXCollections.observableArrayList();
 	/**
-	 * Le HashMap qui relie le solide à son nom, pour pouvoir le traiter dans le
+	 * Le HashMap qui relie le solide Ã  son nom, pour pouvoir le traiter dans le
 	 * tableau ListView.
 	 */
 	public static HashMap<String, Solide> mapSolideNom = new HashMap<String, Solide>();
 
-	public static Vector3d rendering_centre = new Vector3d(0, 0, 0);// Origine de l'affichage
-	static int FONT_SIZE = 10; // taile des caractères
+	public static Vector3d renderingCentre = new Vector3d(0, 0, 0);// Origine de l'affichage
+	static int FONT_SIZE = 10; // taile des caractÃ¨res
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -56,16 +56,16 @@ public class Main extends Application {
 			root = fxmlLoader.load();
 			Scene scene = new Scene(root);
 
-			rendering_centre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
+			renderingCentre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
 
-			// réajuse l'origine
+			// rÃ©ajuse l'origine
 			scene.widthProperty().addListener((obs, oldVal, newVal) -> {
-				rendering_centre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
+				renderingCentre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
 				update(listeSolides, Color.WHITE);
 			});
 
 			scene.heightProperty().addListener((obs, oldVal, newVal) -> {
-				rendering_centre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
+				renderingCentre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
 				update(listeSolides, Color.WHITE);
 			});
 
@@ -90,7 +90,7 @@ public class Main extends Application {
 	}
 
 	/**
-	 * Affiche les caractères ASCII du solide sur la scène.
+	 * Affiche les caractÃ¨res ASCII du solide sur la scÃ¨ne.
 	 * 
 	 * @param s   - Le solide qu'on veut afficher.
 	 * @param col - La couleur dans laquelle on veut l'afficher
@@ -106,9 +106,9 @@ public class Main extends Application {
 				Text t = new Text(p.getEclairage());
 				t.setFill(col);
 
-				t.setFont(Font.font(STYLESHEET_CASPIAN, FontWeight.BOLD, FONT_SIZE));
-				t.setLayoutX(p.getCoordonnee().x + rendering_centre.x);
-				t.setLayoutY(p.getCoordonnee().y + rendering_centre.y);
+				t.setFont(Font.font(STYLESHEET_CASPIAN, FontWeight.BOLD, s.fontSize));
+				t.setLayoutX(p.getCoordonnee().x + renderingCentre.x);
+				t.setLayoutY(p.getCoordonnee().y + renderingCentre.y);
 
 				((Pane) root.getCenter()).getChildren().add(t);
 			}
@@ -116,12 +116,12 @@ public class Main extends Application {
 	}
 
 	/**
-	 * Affiche les caractères ASCII du solide sur la scène. Si un solide est dans la
-	 * liste en paramètre, il sera affiché en rouge au lieu de blanc. À utiliser
-	 * pour montrer quels solides sont séléctionnés dans la ListView de la scène.
+	 * Affiche les caractÃ¨res ASCII du solide sur la scÃ¨ne. Si un solide est dans la
+	 * liste en paramÃ¨tre, il sera affichÃ© en rouge au lieu de blanc. Ã€ utiliser
+	 * pour montrer quels solides sont sÃ©lÃ©ctionnÃ©s dans la ListView de la scÃ¨ne.
 	 * 
-	 * @param solide - Le ArrayList de tous les solides séléctionnés.
-	 * @param col    - La couleur dans laquelle on veut afficher les solides dans la liste. Les autres seront affichés en blanc.
+	 * @param solide - Le ArrayList de tous les solides sÃ©lÃ©ctionnÃ©s.
+	 * @param col    - La couleur dans laquelle on veut afficher les solides dans la liste. Les autres seront affichÃ©s en blanc.
 	 */
 	public static void updateSelective(ArrayList<Solide> solide, Color col) {
 		((Pane) root.getCenter()).getChildren().clear();
@@ -141,9 +141,9 @@ public class Main extends Application {
 				Text t = new Text(p.getEclairage());
 				t.setFill(Color.WHITE);
 
-				t.setFont(Font.font(STYLESHEET_CASPIAN, FontWeight.BOLD, FONT_SIZE));
-				t.setLayoutX(p.getCoordonnee().x + rendering_centre.x);
-				t.setLayoutY(p.getCoordonnee().y + rendering_centre.y);
+				t.setFont(Font.font(STYLESHEET_CASPIAN, FontWeight.BOLD, s.fontSize));
+				t.setLayoutX(p.getCoordonnee().x + renderingCentre.x);
+				t.setLayoutY(p.getCoordonnee().y + renderingCentre.y);
 
 				((Pane) root.getCenter()).getChildren().add(t);
 			}
@@ -156,9 +156,9 @@ public class Main extends Application {
 				Text t = new Text(p.getEclairage());
 				t.setFill(col);
 
-				t.setFont(Font.font(STYLESHEET_CASPIAN, FontWeight.BOLD, FONT_SIZE));
-				t.setLayoutX(p.getCoordonnee().x + rendering_centre.x);
-				t.setLayoutY(p.getCoordonnee().y + rendering_centre.y);
+				t.setFont(Font.font(STYLESHEET_CASPIAN, FontWeight.BOLD, s.fontSize));
+				t.setLayoutX(p.getCoordonnee().x + renderingCentre.x);
+				t.setLayoutY(p.getCoordonnee().y + renderingCentre.y);
 
 				((Pane) root.getCenter()).getChildren().add(t);
 			}
