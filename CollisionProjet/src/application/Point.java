@@ -5,22 +5,50 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.vecmath.Vector3d;
+
+import javafx.scene.paint.Color;
+
 import javax.vecmath.Matrix3d;
 
 public class Point {
-	private Vector3d coordonnée = new Vector3d();
+	private Vector3d coordonnee = new Vector3d();
 	private Vector3d norme = new Vector3d();
 	private Vector3d shadow = new Vector3d();
-	private String éclairage;
+	private String eclairage;
 	private String quadrant = new String();
 	private boolean isRendered = true;
+	private Color color = Color.WHITE;
+	
+	public Vector3d getCoordonnee() {
+		return coordonnee;
+	}
 
+	public void setCoordonnee(Vector3d coordonnee) {
+		this.coordonnee = coordonnee;
+	}
+
+	public Vector3d getNorme() {
+		return norme;
+	}
+
+	public void setNorme(Vector3d norme) {
+		this.norme = norme;
+	}
+	
 	public Vector3d getShadow() {
 		return shadow;
 	}
 
 	public void setShadow(Vector3d shadow) {
 		this.shadow = shadow;
+	}
+	
+	public String getEclairage() {
+		return eclairage;
+	}
+
+	public void setEclairage(String eclairage) {
+		this.eclairage = eclairage;
 	}
 	
 	public void addQuadrant(String s) {
@@ -35,15 +63,6 @@ public class Point {
 		return quadrant;
 	}
 	
-	
-	public String getÉclairage() {
-		return éclairage;
-	}
-
-	public void setÉclairage(String éclairage) {
-		this.éclairage = éclairage;
-	}
-
 	public boolean isRendered() {
 		return isRendered;
 	}
@@ -52,33 +71,27 @@ public class Point {
 		this.isRendered = isRendered;
 	}
 
-	public Vector3d getCoordonnée() {
-		return coordonnée;
+	public Color getColor() {
+		return color;
 	}
 
-	public void setCoordonnée(Vector3d coordonnée) {
-		this.coordonnée = coordonnée;
+	public void setColor(Color color) {
+		this.color = color;
 	}
-
-	public Vector3d getNorme() {
-		return norme;
-	}
-
-	public void setNorme(Vector3d norme) {
-		this.norme = norme;
-	}
-
+	
+	
+	
 	public Point clone() {
-		return new Point((Vector3d) coordonnée.clone(), (Vector3d) norme.clone());
+		return new Point((Vector3d) coordonnee.clone(), (Vector3d) norme.clone());
 	}
 
 	public String toString() {
-		return String.format("X: %f Y: %f Z:%f\nÉclairage:", coordonnée.x, coordonnée.y, coordonnée.z, éclairage);
+		return String.format("X: %f Y: %f Z:%f\nEclairage:", coordonnee.x, coordonnee.y, coordonnee.z, eclairage);
 	}
 
-	public Point(Vector3d coordonnée, Vector3d norme) {
+	public Point(Vector3d coordonnee, Vector3d norme) {
 		norme.normalize();
-		this.coordonnée = coordonnée;
+		this.coordonnee = coordonnee;
 		this.norme = norme;
 	}
 

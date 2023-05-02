@@ -33,11 +33,12 @@ public class test {
 		u.cross(v, getPerpendicular(v));
 
 		System.out.println(getPerpendicular(v).toString() +"   " + u.toString() + "   "+ v.toString());*/
+		/*
 		Matrix3d rotation = new Matrix3d();
 		double phi1 =0;
 		double phi2 =0;
 		
-		Vector3d v = new Vector3d(0,1,1);
+		Vector3d v = new Vector3d(20,12,41);
 		//System.out.println(v);
 		
 		
@@ -51,18 +52,21 @@ public class test {
 		phi2= Math.atan2(v.z,v.x);
 		rotation.rotY(phi2);
 		rotation.transform(v);
-		//System.out.println(v);
+		System.out.println(v);
 		
 		
 		rotation.rotY(-phi2);
 		rotation.transform(v);
+		
+		
+		
 		//System.out.println(v);
 		
 		
 		
 		rotation.rotX(-phi1);
 		rotation.transform(v);
-		//System.out.println(v);
+		System.out.println(v);
 		
 		
 		double theta = 0;
@@ -90,10 +94,18 @@ public class test {
 		} while (theta < 2 * Math.PI);
 		
 		System.out.println(cercle);
+		*/
 		
+		Matrix3d dtheta = new Matrix3d();
+		Matrix3d m1 = new Matrix3d();
+		Matrix3d m2 = new Matrix3d();
 		
-		
-				
+		m1.rotX(Math.PI/3);
+		System.out.println(m1);
+		m2.rotY(Math.PI/3);
+		System.out.println(m2);
+		dtheta.mul(m1,m2);
+		System.out.println(dtheta);
 	    
 		
 		
