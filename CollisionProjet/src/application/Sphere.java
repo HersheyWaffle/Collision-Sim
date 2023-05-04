@@ -20,25 +20,28 @@ public class Sphere extends Solide {
 	private double rayon; // Rayon du cercle
 	private double decalage; // Decalage du cercle de son origine, pour former un tore
 	private double dThetaCercle; // Angle en Rad entre chaque point dans le cercle
-	
+
 	private ArrayList<Point> cercle = new ArrayList<Point>(); // Liste des vecteurs 3D de chaque point dans le
-																	// cercle
+																// cercle
 	private ArrayList<Point> sphere = new ArrayList<Point>(); // Liste des listes des vecteurs 3D de chaque point
-																	// dans chaque cercle
+																// dans chaque cercle
 
 //=========================CONSTRUCTEUR=======================	
 
 	/**
-	 * Objet spherique.
+	 * Objet spherique sans paramètres physiques (vitesse, masse).
 	 * 
 	 * @param rayon    - Le rayon de la sphere
 	 * @param decalage - Le decalage du cercle. Va former un Tore.
-	 * @param fontSize - taille des caract�res
+	 * @param fontSize - taille des caractères
 	 */
 	public Sphere(double rayon, double decalage, int fontSize) {
-		super.setFontSize(fontSize);
+		super();
+		setFontSize(fontSize);
 		this.rayon = rayon;
 		this.decalage = decalage;
+
+		rayonDeCollision = rayon + 100;
 		dThetaCercle = 2 * Math.PI / (rayon / ESPACE_ENTRE_POINTS);
 
 		virtualCentre = new Vector3d(0, 0, 0);
@@ -50,6 +53,37 @@ public class Sphere extends Solide {
 		clean();
 		render(super.getFontSize());
 		setSolide(sphere);
+		inertie(new Vector3d(0, 0, 1));
+	}
+
+	/**
+	 * Objet spherique.
+	 * 
+	 * @param rayon    - Le rayon de la sphere
+	 * @param decalage - Le decalage du cercle. Va former un Tore.
+	 * @param fontSize - La taille des caractères
+	 * @param vitesse  - La vitesse initiale de l'objet
+	 * @param masse    - La masse de l'objet en kg
+	 */
+	public Sphere(double rayon, double decalage, int fontSize, Vector3d vitesse, double masse) {
+		super(vitesse, masse);
+		setFontSize(fontSize);
+		this.rayon = rayon;
+		this.decalage = decalage;
+
+		rayonDeCollision = rayon + 100;
+		dThetaCercle = 2 * Math.PI / (rayon / ESPACE_ENTRE_POINTS);
+
+		virtualCentre = new Vector3d(0, 0, 0);
+		setCercle();
+		Solide.setFormeRotation(dThetaCercle, cercle, sphere);
+		Solide.enleveDoublons(getSphere());
+
+		quadrant();
+		clean();
+		render(super.getFontSize());
+		setSolide(sphere);
+		inertie(new Vector3d(0, 0, 1));
 	}
 
 //=========================METHODES=========================	
@@ -106,7 +140,7 @@ public class Sphere extends Solide {
 			rotation.transform(initial);
 			Vector3d v = new Vector3d(decalage, 0, 0);
 			initial.add(v);
-			//v.normalize(initial);
+			// v.normalize(initial);
 			cercle.add(new Point(initial, (Vector3d) initial.clone()));
 
 			theta += dThetaCercle;

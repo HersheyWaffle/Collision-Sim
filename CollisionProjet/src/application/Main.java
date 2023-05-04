@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -26,7 +27,9 @@ import javafx.scene.text.Text;
  * @author Omar Ghazaly, Abel-Jimmy Oyono-Montoki
  */
 public class Main extends Application {
+	// Global Variables
 	public static final boolean DEBUG_MODE = true;
+	public static final int SECONDS_PER_UPDATE = 1;
 
 	public static BorderPane root;
 	/**
@@ -61,17 +64,21 @@ public class Main extends Application {
 			// réajuse l'origine
 			scene.widthProperty().addListener((obs, oldVal, newVal) -> {
 				renderingCentre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
-				update(listeSolides, Color.WHITE);
+				updateCollision();
 			});
 
 			scene.heightProperty().addListener((obs, oldVal, newVal) -> {
 				renderingCentre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
-				update(listeSolides, Color.WHITE);
+				updateCollision();
 			});
 
-			// GENERALISE INTO CONTROLLER
-//			Sphere s = new Sphere(50, 25, FONT_SIZE);
-//			update(s, root);
+			root.setOnScroll((ScrollEvent event) -> {
+
+				double z = event.getDeltaY();
+
+				Solide.distanceObservateur += z;
+				updateCollision();
+			});
 
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setTitle("Simulateur de collisions");
@@ -89,6 +96,30 @@ public class Main extends Application {
 
 	}
 
+	public static void updateCollision() {
+		((Pane) root.getCenter()).getChildren().clear();
+		for (Solide s : Main.listeSolides) {
+			s.isColliding = false;
+			s.setWhite();
+			Lumiere.lumiereObjet(s.getSolide());
+
+			// enlève les objets trop loin
+			/*
+			 * if (s.virtualCentre.length() > 300) { solides.remove(s); }
+			 */
+		}
+
+		for (int i = 0; i < Main.listeSolides.size() - 1; i++) {
+			for (int j = i + 1; j < Main.listeSolides.size(); j++) {
+				if (Main.listeSolides.get(i).detecteurDeProximite(Main.listeSolides.get(j), SECONDS_PER_UPDATE)) {
+					Main.listeSolides.get(i).detecteurDeCollision(Main.listeSolides.get(j), SECONDS_PER_UPDATE);
+
+				}
+			}
+		}
+		update(Main.listeSolides, Color.WHITE);
+	}
+	
 	/**
 	 * Affiche les caractères ASCII du solide sur la scène.
 	 * 
@@ -121,7 +152,8 @@ public class Main extends Application {
 	 * pour montrer quels solides sont séléctionnés dans la ListView de la scène.
 	 * 
 	 * @param solide - Le ArrayList de tous les solides séléctionnés.
-	 * @param col    - La couleur dans laquelle on veut afficher les solides dans la liste. Les autres seront affichés en blanc.
+	 * @param col    - La couleur dans laquelle on veut afficher les solides dans la
+	 *               liste. Les autres seront affichés en blanc.
 	 */
 	public static void updateSelective(ArrayList<Solide> solide, Color col) {
 		((Pane) root.getCenter()).getChildren().clear();

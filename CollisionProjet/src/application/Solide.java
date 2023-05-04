@@ -20,21 +20,80 @@ import javafx.scene.shape.Circle;
 public class Solide {
 
 //=========================VARIABLES=========================	
-
-	Vector3d virtualCentre = new Vector3d(0, 0, 0);
-	static Matrix3d rotation = new Matrix3d();
-
-	final double Z_CONST = 400;
-	final static int CONSTANTE_OMBRE = 10;
-	final double ESPACE_ENTRE_POINT = 1;
-	int fontSize = 10;
-
+	// Le solide dans l'espace
 	private ArrayList<Point> solide = new ArrayList<Point>();
 	ArrayList<Point> renderedSolide = new ArrayList<Point>();
+	Vector3d virtualCentre = new Vector3d(0, 0, 0);
+
+	// Collision
+	double rayonDeCollision;
+	boolean isColliding = false;
+
+	// Optimisation
 	ArrayList<ArrayList<Point>> space = new ArrayList<ArrayList<Point>>();
 	ArrayList<ArrayList<Point>> zBufferSpace;
 
+	// Paramètres physiques
+	private Vector3d vitesse = new Vector3d();
+	private Vector3d vitesseAngulaire = new Vector3d();
+	private double masse;
+	private double momentInertie = 0;
+	private static double coefficientDeRestitution = 19 / 20;
+
+	// Utilitaire
+	static Matrix3d rotation = new Matrix3d();
+
+	// Constantes
+	static double distanceObservateur = 0;
+	int fontSize = 10;
+	final static int CONSTANTE_OMBRE = 10;
+	final double Z_CONST = 400;
+	final double ESPACE_ENTRE_POINT = fontSize - 1;
+
+//=========================CONSTRUCTEUR=======================	
+
+	/**
+	 * Initialise le Solide.
+	 * 
+	 * @param vitesse - Vecteur de vitesse
+	 * @param masse   - La masse du solide en kg
+	 */
+	public Solide(Vector3d vitesse, double masse) {
+		this.vitesse = vitesse;
+		this.virtualCentre = new Vector3d();
+		inertie(new Vector3d(1, 0, 0));
+		this.masse = masse;
+	}
+
+	/**
+	 * Initialise le Solide sans paramètres. La vitesse est nulle et la masse est de
+	 * 30kg.
+	 */
+	public Solide() {
+		this.vitesse = new Vector3d();
+		this.virtualCentre = new Vector3d();
+		inertie(new Vector3d(1, 0, 0));
+		masse = 30;
+	}
+
 //=========================METHODES=========================	
+
+	/**
+	 * Initialise le moment d'inertie
+	 * 
+	 * @param axe -le vecteur sur lequel on effectue le calcul
+	 */
+	public void inertie(Vector3d axe) {
+		double dm = masse / solide.size();
+		axe.normalize();
+		for (Point p : solide) {
+			Vector3d projection = (Vector3d) axe.clone();
+			projection.scale(p.getCoordonnee().dot(axe));
+			Vector3d R = new Vector3d();
+			R.sub(p.getCoordonnee(), projection);
+			momentInertie += R.lengthSquared() * dm;
+		}
+	}
 
 	/**
 	 * Déplace le centre du solide
@@ -43,6 +102,51 @@ public class Solide {
 	 */
 	public void deplacement(Vector3d dv) {
 		virtualCentre.add(dv);
+	}
+
+	/**
+	 * Déplace le centre du solide dans un Timeline.
+	 * 
+	 * @param dt -le temps entre chaque déplacement en secondes
+	 */
+	public void deplacementTime(double dt) {
+
+		// deplacement lineaire
+		Vector3d dv = new Vector3d();
+		dv.scale(dt, vitesse);
+		virtualCentre.add(dv);
+
+		// deplacement angulaire
+
+		double phi1 = 0;
+		double phi2 = 0;
+		double phi3 = vitesseAngulaire.length() * dt;
+
+		Matrix3d dtheta = new Matrix3d();
+		Matrix3d m1 = new Matrix3d();
+		Matrix3d m2 = new Matrix3d();
+
+		Vector3d w = (Vector3d) vitesseAngulaire.clone();
+
+		// les angles pour ramener sur l'axe des x
+		phi1 = Math.atan2(w.y, w.z);
+		m1.rotX(phi1);
+		m1.transform(w);
+		phi2 = Math.atan2(w.z, w.x);
+
+		// ramène sur l'axe des x
+		m1.rotX(phi1);
+		m2.rotY(phi2);
+		dtheta.mul(m1, m2);
+		// fait la rotation en x
+		m1.rotX(-phi3);
+		dtheta.mul(m1);
+		// ramène sur l'axe de rotation original
+		m2.rotY(-phi2);
+		m1.rotX(-phi1);
+		dtheta.mul(m2);
+		dtheta.mul(m1);
+		transformLinear(dtheta);
 	}
 
 	/**
@@ -85,6 +189,34 @@ public class Solide {
 	 */
 	public void setFontSize(int fontSize) {
 		this.fontSize = fontSize;
+	}
+
+	/**
+	 * @return the vitesse
+	 */
+	public Vector3d getVitesse() {
+		return vitesse;
+	}
+
+	/**
+	 * @param vitesse the vitesse to set
+	 */
+	public void setVitesse(Vector3d vitesse) {
+		this.vitesse = vitesse;
+	}
+
+	/**
+	 * @return the masse
+	 */
+	public double getMasse() {
+		return masse;
+	}
+
+	/**
+	 * @param masse the masse to set
+	 */
+	public void setMasse(double masse) {
+		this.masse = masse;
 	}
 
 	/**
@@ -146,7 +278,7 @@ public class Solide {
 	 * @param v            - Le Vector3D duquel nous voulons déterminer le cercle de
 	 *                     vecteurs perpendiculaires.
 	 * @param rayon        - Le rayon du cercle.
-	 * @param arcCercle     - L'angle en radians de l'arc du cercle.
+	 * @param arcCercle    - L'angle en radians de l'arc du cercle.
 	 * 
 	 * @return retourne un ArrayList de Vector3D, chacun perpendiculaire au vecteur
 	 *         v.
@@ -162,7 +294,7 @@ public class Solide {
 
 		Vector3d v1 = (Vector3d) v.clone();
 
-		//Calcul l'angle Ramène sur l'axe des z
+		// Calcul l'angle Ramène sur l'axe des z
 
 		phi1 = Math.atan2(v1.y, v1.z);
 
@@ -195,10 +327,12 @@ public class Solide {
 	}
 
 	/**
-	 * Retourne un ArrayList du Array List des points du solide, divisés selon les quadrants.
+	 * Retourne un ArrayList du Array List des points du solide, divisés selon les
+	 * quadrants.
 	 * 
-	 * @param section - Le Array List de tous les vecteurs représentant les quadrants de la carte
-	 * @param objet - Le solide représenté par une liste de points
+	 * @param section - Le Array List de tous les vecteurs représentant les
+	 *                quadrants de la carte
+	 * @param objet   - Le solide représenté par une liste de points
 	 */
 	public static ArrayList<ArrayList<Point>> quadrant(ArrayList<Vector3d> section, ArrayList<Point> objet) {
 
@@ -243,7 +377,7 @@ public class Solide {
 	/**
 	 * Indique quel point est dans l'ombre de la lumière
 	 * 
-	 * @param v1 - Le vecteur représentant la source de la lumière
+	 * @param v1    - Le vecteur représentant la source de la lumière
 	 * @param objet - La liste de points représentant le solide.
 	 */
 	public static void vBuffer(Vector3d v1, ArrayList<Point> objet) {
@@ -317,33 +451,40 @@ public class Solide {
 	/**
 	 * Calcule le solide à afficher
 	 * 
-	 * @param FONT_SIZE - La taille de police des caractères, ne devrait techniquement pas changer.
+	 * @param fontSize - La taille de police des caractères, ne devrait
+	 *                 techniquement pas changer.
 	 */
-	public void render(final int FONT_SIZE) {
+	public void render(final int fontSize) {
 		renderedSolide.clear();
 
-		this.fontSize = (int) ((Z_CONST * FONT_SIZE) / (Z_CONST + virtualCentre.z));
-		
+		// scale les caractères du donut
+		this.fontSize = (int) Math.ceil((Z_CONST * fontSize) / (Z_CONST + virtualCentre.z + distanceObservateur));
+
 		// copie les points de la sphere dans la rendered sphere
 		for (Point p : solide) {
-			Vector3d v = ((Vector3d) p.getCoordonnee().clone());
-			
+			Vector3d v = (Vector3d) p.getCoordonnee().clone();
+
 			// update to rendering position
-			v.z += virtualCentre.z + Z_CONST;
 
-			v.x *= (Z_CONST) / (v.z);
-			v.y *= (Z_CONST) / (v.z);
+			v.z += virtualCentre.z + distanceObservateur + Z_CONST;
 
-			//
-			v.x += (virtualCentre.x * Z_CONST) / (virtualCentre.z + Z_CONST);
-			v.y += (virtualCentre.y * Z_CONST) / (virtualCentre.z + Z_CONST);
+			// ajoute le point seulement si il est devant l'observateur
+			if (v.z > 0) {
 
-			v.x = ((int) v.x / this.fontSize) * this.fontSize;
-			v.y = ((int) v.y / this.fontSize) * this.fontSize;
+				v.x *= (Z_CONST) / (v.z);
+				v.y *= (Z_CONST) / (v.z);
 
-			Point renderedPoint = new Point(v, new Vector3d());
-			renderedPoint.setEclairage(p.getEclairage());
-			renderedSolide.add(renderedPoint);
+				v.x += (virtualCentre.x * Z_CONST) / (virtualCentre.z + distanceObservateur + Z_CONST);
+				v.y += (virtualCentre.y * Z_CONST) / (virtualCentre.z + distanceObservateur + Z_CONST);
+
+				v.x = ((int) v.x / this.fontSize) * this.fontSize;
+				v.y = ((int) v.y / this.fontSize) * this.fontSize;
+
+				Point renderedPoint = new Point(v, new Vector3d());
+				renderedPoint.setEclairage(p.getEclairage());
+				renderedPoint.setColor(p.getColor());
+				renderedSolide.add(renderedPoint);
+			}
 		}
 
 		ArrayList<Vector3d> section = cerclePerpendiculaire(Math.PI / 6, new Vector3d(0, 0, 1), 1, Math.PI);
@@ -352,13 +493,14 @@ public class Solide {
 
 		// z-buffer
 		for (ArrayList<Point> quadrant : zBufferSpace) {
+
 			for (int i = 0; i < quadrant.size() - 1; i++) {
 				for (int j = i + 1; j < quadrant.size(); j++) {
-
 					// for vector rendered at the same place
+
 					if ((int) quadrant.get(i).getCoordonnee().x == (int) quadrant.get(j).getCoordonnee().x
 							&& (int) quadrant.get(i).getCoordonnee().y == (int) quadrant.get(j).getCoordonnee().y) {
-						// delete the farthest one
+						// delete the fartest one
 						if (quadrant.get(i).getCoordonnee().z < quadrant.get(j).getCoordonnee().z) {
 							quadrant.get(j).setRendered(false);
 						}
@@ -374,14 +516,16 @@ public class Solide {
 
 		// to clean renderSphere
 		for (int i = 0; i < renderedSolide.size(); i++) {
+
 			if (!renderedSolide.get(i).isRendered()) {
+
 				renderedSolide.remove(renderedSolide.get(i));
 				i--;
 			}
+
 		}
 	}
-	
-	
+
 	/**
 	 * Fait tourner le solide sur le centre de la scène.
 	 * 
@@ -391,16 +535,19 @@ public class Solide {
 	 */
 	public void rotate(double thetax, double thetay, double thetaz) {
 		rotation.rotX(thetax);
+		rotation.transform(vitesse);
+		rotation.transform(vitesseAngulaire);
 		rotation.transform(virtualCentre);
 		rotation.rotY(thetay);
+		rotation.transform(vitesse);
+		rotation.transform(vitesseAngulaire);
 		rotation.transform(virtualCentre);
 		rotation.rotZ(thetaz);
+		rotation.transform(vitesse);
+		rotation.transform(vitesseAngulaire);
 		rotation.transform(virtualCentre);
-		
+
 		for (Point p : solide) {
-//			p.getCoordonnee().add(virtual_centre);
-//			p.getNorme().add(virtual_centre);
-			
 			rotation.rotX(thetax);
 			rotation.transform(p.getCoordonnee());
 			rotation.transform(p.getNorme());
@@ -410,15 +557,12 @@ public class Solide {
 			rotation.rotZ(thetaz);
 			rotation.transform(p.getCoordonnee());
 			rotation.transform(p.getNorme());
-			
-//			p.getCoordonnee().sub(virtual_centre);
-//			p.getNorme().sub(virtual_centre);
-			p.getNorme().normalize();
+
 			p.setRendered(true);
 		}
 		Lumiere.lumiereObjet(solide);
 	}
-	
+
 	/**
 	 * Fait tourner le solide autour de lui-même.
 	 * 
@@ -428,7 +572,6 @@ public class Solide {
 	 */
 	public void rotateSelf(double thetax, double thetay, double thetaz) {
 		for (Point p : solide) {
-			
 			rotation.rotX(thetax);
 			rotation.transform(p.getCoordonnee());
 			rotation.transform(p.getNorme());
@@ -438,15 +581,14 @@ public class Solide {
 			rotation.rotZ(thetaz);
 			rotation.transform(p.getCoordonnee());
 			rotation.transform(p.getNorme());
-			
-			p.getNorme().normalize();
+
 			p.setRendered(true);
 		}
 		Lumiere.lumiereObjet(solide);
 	}
 
 	/**
-	 * G�n�re les points d'un solide en effectuant une rotation sur un plan.
+	 * Génère les points d'un solide en effectuant une rotation sur un plan.
 	 * 
 	 * @param dThetaCercle - Angle en Rad entre chaque point dans le cercle
 	 * @param plan         - La liste de tous les points du plan qui va former le
@@ -471,7 +613,191 @@ public class Solide {
 			theta += dThetaCercle;
 		} while (theta < 2 * Math.PI);
 	}
-	
+
+	/**
+	 * Applique une transformation lineaire à tout les points de solide
+	 */
+	public void transformLinear(Matrix3d transform) {
+		for (Point p : solide) {
+			transform.transform(p.getCoordonnee());
+			transform.transform(p.getNorme());
+		}
+	}
+
+	/**
+	 * Detecte si deux solides sont proche
+	 * 
+	 * @param solide2 - le second solide
+	 * @param dt      - intervalle de collision
+	 * @return boolean - si les deux solides s'intersecte
+	 */
+	public boolean detecteurDeProximite(Solide solide2, double dt) {
+		Vector3d distance = new Vector3d();
+
+		distance.sub(this.virtualCentre, solide2.virtualCentre);
+
+		this.isColliding = solide2.isColliding = distance.length() <= this.rayonDeCollision + solide2.rayonDeCollision
+				? true
+				: false;
+		return distance.length() <= this.rayonDeCollision + solide2.rayonDeCollision;
+	}
+
+	/**
+	 * Detecte si deux solides sont en collision
+	 * 
+	 * @param solide2 - le second solide
+	 * @param dt      - intervalle de collision
+	 * 
+	 */
+	public void detecteurDeCollision(Solide solide2, double dt) {
+		Vector3d distance2 = new Vector3d();
+
+		ArrayList<Point> potentialCollisionPoint1 = new ArrayList<Point>();
+		ArrayList<Point> potentialCollisionPoint2 = new ArrayList<Point>();
+
+		// trouve les points potentiel de collision du solide 1
+		for (Point p : solide) {
+			Vector3d coordonneeReel = new Vector3d();
+
+			coordonneeReel.add(p.getCoordonnee(), this.virtualCentre);
+
+			distance2.sub(coordonneeReel, solide2.virtualCentre);
+			if (distance2.length() < solide2.rayonDeCollision) {
+				potentialCollisionPoint1.add(p);
+			}
+		}
+
+		// trouve les points potentiel de collision du solide 2
+		for (Point p : solide2.solide) {
+			Vector3d coordonneeReel = new Vector3d();
+
+			coordonneeReel.add(p.getCoordonnee(), solide2.virtualCentre);
+
+			distance2.sub(coordonneeReel, this.virtualCentre);
+			if (distance2.length() < this.rayonDeCollision) {
+				potentialCollisionPoint2.add(p);
+			}
+		}
+
+		if (Main.DEBUG_MODE) System.out.println("1: " + potentialCollisionPoint1.size());
+		if (Main.DEBUG_MODE) System.out.println("2: " + potentialCollisionPoint2.size());
+
+		ArrayList<Point> CollisionPoint1 = new ArrayList<Point>();
+		ArrayList<Point> CollisionPoint2 = new ArrayList<Point>();
+
+		// trouve les points de collision
+		for (Point p1 : potentialCollisionPoint1) {
+			for (Point p2 : potentialCollisionPoint2) {
+				Vector3d v1 = new Vector3d();
+				Vector3d v2 = new Vector3d();
+
+				v1.add(p1.getCoordonnee(), this.virtualCentre);
+				v2.add(p2.getCoordonnee(), solide2.virtualCentre);
+
+				distance2.sub(v1, v2);
+
+				if (distance2.length() < 10) {
+					CollisionPoint1.add(p1);
+					CollisionPoint2.add(p2);
+					p1.setColor(Color.RED);
+					p2.setColor(Color.RED);
+				}
+			}
+		}
+
+		// average des points de collisions
+		if (CollisionPoint1.size() != 0) {
+			Vector3d coordonnee = new Vector3d();
+			Vector3d norme = new Vector3d();
+			Point l1 = new Point(coordonnee, norme);
+			for (Point p : CollisionPoint1) {
+				coordonnee.add(p.getCoordonnee());
+				coordonnee.scale(1 / CollisionPoint1.size());
+				norme.add(p.getNorme());
+				norme.scale(1 / CollisionPoint1.size());
+			}
+			l1.setCoordonnee(coordonnee);
+			l1.setNorme(norme);
+
+			Point l2 = new Point(coordonnee, norme);
+			for (Point p : CollisionPoint1) {
+				coordonnee.add(p.getCoordonnee());
+				coordonnee.scale(1 / CollisionPoint1.size());
+				norme.add(p.getNorme());
+				norme.scale(1 / CollisionPoint1.size());
+			}
+			l2.setCoordonnee(coordonnee);
+			l2.setNorme(norme);
+
+			resolveCollision(solide2, dt, l1, l2);
+		}
+
+		if (Main.DEBUG_MODE) System.out.println("3: " + CollisionPoint1.size());
+		if (Main.DEBUG_MODE) System.out.println("4: " + CollisionPoint2.size());
+	}
+
+	/**
+	 * resout les collisions de manière elastique
+	 * 
+	 * @param solide2 - solide avec lequel il est en collision
+	 * @param dt      - intervalle de temps
+	 * @param p1      - point de collision du solide1
+	 * @param p2      - point de collision du solide2
+	 */
+	public void resolveCollision(Solide solide2, double dt, Point p1, Point p2) {
+		// collision elastique
+		// calcul les vitesses finales
+		Vector3d vitesseFinale1 = new Vector3d();
+		Vector3d vitesseFinale2 = new Vector3d();
+		Vector3d u1 = new Vector3d();
+		Vector3d u2 = new Vector3d();
+		u1.scaleAdd(2 * solide2.masse / (this.masse + solide2.masse), solide2.vitesse, new Vector3d());
+		u2.scaleAdd((this.masse - solide2.masse) / (this.masse + solide2.masse), this.vitesse, new Vector3d());
+		vitesseFinale1.add(u1, u2);
+
+		u1.scaleAdd(2 * this.masse / (this.masse + solide2.masse), this.vitesse, new Vector3d());
+		u2.scaleAdd((solide2.masse - this.masse) / (this.masse + solide2.masse), solide2.vitesse, new Vector3d());
+		vitesseFinale2.add(u1, u2);
+
+		// calcul les forces subits par les objets
+		Vector3d force1 = new Vector3d();
+		Vector3d force2 = new Vector3d();
+
+		force1.sub(vitesseFinale1, this.vitesse);
+		force1.scale(this.masse / dt);
+		force2.sub(vitesseFinale2, solide2.vitesse);
+		force2.scale(solide2.masse / dt);
+
+		// calcul les forces subits par les objets
+		Vector3d vitesseAngulaire1 = new Vector3d();
+		Vector3d vitesseAngulaire2 = new Vector3d();
+
+		vitesseAngulaire1.cross(p1.getCoordonnee(), force1);
+		vitesseAngulaire1.scale(dt / this.momentInertie);
+		vitesseAngulaire1.add(this.vitesseAngulaire);
+
+		vitesseAngulaire2.cross(p2.getCoordonnee(), force2);
+		vitesseAngulaire2.scale(dt / solide2.momentInertie);
+		vitesseAngulaire2.add(solide2.vitesseAngulaire);
+
+		// change les paramètres physiques
+		this.vitesse = vitesseFinale1;
+		this.vitesseAngulaire = vitesseAngulaire1;
+		solide2.vitesse = vitesseFinale2;
+		solide2.vitesseAngulaire = vitesseAngulaire2;
+
+		// resout la collision
+
+		// this.deplacement2(10 * dt);
+		// solide2.deplacement2(10 * dt);
+	}
+
+	public void setWhite() {
+		for (Point p : solide) {
+			p.setColor(Color.WHITE);
+		}
+	}
+
 	/**
 	 * Effectue une rotation sur le solide. Les param�tres sont en DEGR�S
 	 * 
@@ -480,7 +806,6 @@ public class Solide {
 	 * @param rotY   - Rotation sur l'axe des Y
 	 * @param rotZ   - Rotation sur l'axe des Z
 	 */
-
 	@Deprecated
 	public static void rotateSolide(ArrayList<Point> solide, double rotX, double rotY, double rotZ, double posX,
 			double posY, double posZ) {
@@ -504,7 +829,7 @@ public class Solide {
 			}
 		}
 	}
-	
+
 	/**
 	 * Ajoute des objets Circle au pane selon la liste de points du solide.
 	 * 
@@ -514,7 +839,6 @@ public class Solide {
 	 * @param posY   - La position initiale en Y du solide.
 	 * @param posZ   - La position initiale en Z du solide.
 	 */
-
 	@Deprecated
 	public static void creeForme(ArrayList<Vector3d> solide, Pane pane, double posX, double posY, double posZ) {
 		for (Vector3d v : solide) {

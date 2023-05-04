@@ -28,9 +28,9 @@ public class Cube extends Solide {
 	/**
 	 * Objet cubique.
 	 * 
-	 * @param longueur  - La longueur du cube.
-	 * @param largeur   - La largeur du cube.
-	 * @param hauteur   - La hauteur du cube.
+	 * @param longueur - La longueur du cube.
+	 * @param largeur  - La largeur du cube.
+	 * @param hauteur  - La hauteur du cube.
 	 * @param fontSize - taille des caract�res
 	 */
 	public Cube(double longueur, double largeur, double hauteur, int fontSize) {
@@ -43,10 +43,14 @@ public class Cube extends Solide {
 		setCube();
 		Solide.enleveDoublons(getCube());
 
+		Vector3d util = new Vector3d(longueur / 2, largeur / 2, hauteur / 2);
+		rayonDeCollision = util.length();
+
 		quadrant();
 		clean();
 		render(super.getFontSize());
 		setSolide(cube);
+		inertie(new Vector3d(1, 0, 0));
 	}
 
 //=========================METHODES=========================	

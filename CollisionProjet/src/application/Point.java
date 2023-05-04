@@ -2,6 +2,8 @@ package application;
 
 import javax.vecmath.Vector3d;
 
+import javafx.scene.paint.Color;
+
 /**
  * Classe Vecteur avec plus d'information que Vector3D ne fournit pas. Utilisé
  * entre autre pour calculer la norme des points dans les solides pour pouvoir
@@ -21,6 +23,7 @@ public class Point {
 	private String quadrant; // String représentant la région dans laquelle se trouve le point. Définit par
 								// une séquence de 0 et de 1, représentant les coordonnées du quadrant
 	private boolean isRendered; // Détermine si le point sera rendered sur l'écran
+	private Color color = Color.WHITE;
 
 //=========================CONSTRUCTEUR=======================		
 
@@ -55,7 +58,7 @@ public class Point {
 	}
 
 	/**
-	 * D�finit la valeur du Vector3D des coordonnées du point.
+	 * Définit la valeur du Vector3D des coordonnées du point.
 	 * 
 	 * @param coordonnee - Le vecteurs 3D indiquant la position 3D du point.
 	 */
@@ -74,7 +77,7 @@ public class Point {
 	}
 
 	/**
-	 * D�finit la valeur du Vector3Dqui représente la Norme du point.
+	 * Définit la valeur du Vector3D qui représente la Norme du point.
 	 * 
 	 * @param norme - Le vecteurs 3D indiquant la position 3D de la norme du point.
 	 */
@@ -101,7 +104,7 @@ public class Point {
 	}
 
 	/**
-	 * Retourne le caractère repr�sentant le degré de luminosité du point. Les 12
+	 * Retourne le caractère représentant le degré de luminosité du point. Les 12
 	 * niveaux sont ".,-~:;=!*#$@"
 	 * 
 	 * @return retourne un String indiquant le degré de luminosité du point.
@@ -111,13 +114,31 @@ public class Point {
 	}
 
 	/**
-	 * D�finit la valeur de l'éclairage.
+	 * Définit la valeur de l'éclairage.
 	 * 
 	 * @param eclairage - Le String représentant le degré d'éclairage du point.
 	 *                  Valeurs possibles: ".,-~:;=!*#$@"
 	 */
 	public void setEclairage(String eclairage) {
 		this.eclairage = eclairage;
+	}
+	
+	/**
+	 * Retourne la couleur du point.
+	 * 
+	 * @return Le Color Enum représentant la couleur du point.
+	 */
+	public Color getColor() {
+		return color;
+	}
+	
+	/**
+	 * Définit la couleur du point.
+	 * 
+	 * @param color - Le Color Enum représentant la couleur du point.
+	 */
+	public void setColor(Color color) {
+		this.color = color;
 	}
 
 	/**
@@ -156,7 +177,7 @@ public class Point {
 	}
 
 	/**
-	 * D�finit si le point doit être rendered.
+	 * Définit si le point doit être rendered.
 	 * 
 	 * @param isRendered - Le Boolean indiquant si le point sera rendered ou non.
 	 */

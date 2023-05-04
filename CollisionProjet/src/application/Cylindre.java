@@ -29,8 +29,8 @@ public class Cylindre extends Solide {
 	/**
 	 * Objet cylindrique.
 	 * 
-	 * @param rayon   - Le rayon du cylindre.
-	 * @param hauteur - La hauteur du cylindre.
+	 * @param rayon    - Le rayon du cylindre.
+	 * @param hauteur  - La hauteur du cylindre.
 	 * @param fontSize - taille des caract�res
 	 */
 	public Cylindre(double rayon, double hauteur, final int fontSize) {
@@ -44,10 +44,14 @@ public class Cylindre extends Solide {
 		Solide.setFormeRotation(dThetaCercle, carre, cylindre);
 		Solide.enleveDoublons(getCylindre());
 
+		Vector3d util = new Vector3d(rayon, 0, hauteur / 2);
+		rayonDeCollision = util.length();
+
 		quadrant();
 		clean();
 		render(super.getFontSize());
 		setSolide(cylindre);
+		inertie(new Vector3d(1, 0, 0));
 	}
 
 //=========================METHODES=========================

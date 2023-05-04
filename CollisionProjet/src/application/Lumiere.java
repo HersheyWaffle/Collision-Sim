@@ -15,7 +15,7 @@ public class Lumiere {
 	
 	public static Vector3d source = new Vector3d(0, -1, -1);
 	private final static String NIVEAU_DE_LUMIERE = ".,-~:;=!*#$@";
-	private final static int INTENSITE_LUMINEUSE = 2;
+	private final static double INTENSITE_LUMINEUSE = 0.6;
 	
 //=========================METHODES=========================	
 	
@@ -55,7 +55,7 @@ public class Lumiere {
 		source.normalize();
 		for (Point n : objet) {
 			n.getNorme().normalize();
-			double d = Math.floor((NIVEAU_DE_LUMIERE.length() - 1) * Math.pow(source.dot(n.getNorme()), 0.6));
+			double d = Math.floor((NIVEAU_DE_LUMIERE.length() - 1) * Math.pow(source.dot(n.getNorme()), INTENSITE_LUMINEUSE));
 			if (d >= 0) {
 				n.setEclairage(NIVEAU_DE_LUMIERE.charAt((int) d) + "");
 			}

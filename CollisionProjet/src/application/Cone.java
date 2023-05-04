@@ -29,8 +29,8 @@ public class Cone extends Solide {
 	/**
 	 * Objet cylindrique.
 	 * 
-	 * @param rayon   - Le rayon du cylindre.
-	 * @param hauteur - La hauteur du cylindre.
+	 * @param rayon    - Le rayon du cylindre.
+	 * @param hauteur  - La hauteur du cylindre.
 	 * @param fontSize - taille des caract�res
 	 */
 	public Cone(double rayon, double hauteur, final int fontSize) {
@@ -44,10 +44,14 @@ public class Cone extends Solide {
 		Solide.setFormeRotation(dThetaCercle, triangle, cone);
 		Solide.enleveDoublons(getCone());
 
+		Vector3d util = new Vector3d(rayon, 0, hauteur);
+		rayonDeCollision = util.length();
+
 		quadrant();
 		clean();
 		render(super.getFontSize());
 		setSolide(cone);
+		inertie(new Vector3d(1, 0, 0));
 	}
 
 //=========================METHODES=========================	

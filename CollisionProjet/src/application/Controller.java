@@ -6,6 +6,9 @@ import java.util.ArrayList;
 
 import javax.vecmath.Vector3d;
 
+import javafx.animation.Animation.Status;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -36,11 +39,12 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 /**
  * Classe utilitaire qui gère les controlles de l'interface d'utilisation.
  * 
- * @version 1.3.0 2023-03-08
+ * @version 1.7.0 2023-05-02
  * @author Omar Ghazaly
  */
 public class Controller {
@@ -57,6 +61,7 @@ public class Controller {
 	private MenuItem ctxtMenuItemCombine = new MenuItem("Combiner");
 	private MenuItem ctxtMenuItemDelete = new MenuItem("Supprimer");
 	private ContextMenu ctxtMenuListObj = new ContextMenu();
+	private Timeline loop;
 
 	@FXML
 	Pane panePane; // Le panneau Pane dans lequel se trouvent les solides
@@ -186,7 +191,7 @@ public class Controller {
 	}
 
 	/**
-	 * Cr�e un solide selon les param�tres séléctionnés dans la fenêtre de
+	 * Crée un solide selon les param�tres séléctionnés dans la fenêtre de
 	 * paramètres et les ajoute à une liste.
 	 */
 	@SuppressWarnings("unchecked")
@@ -247,6 +252,9 @@ public class Controller {
 			cube.virtualCentre = new Vector3d(Double.valueOf(txtX.getText()), Double.valueOf(txtY.getText()),
 					Double.valueOf(txtZ.getText()));
 
+			cube.setVitesse(new Vector3d(Double.valueOf(txtX.getText())/-10, Double.valueOf(txtY.getText())/-10, Double.valueOf(txtZ.getText())/-10));
+			cube.setMasse(Double.valueOf(txtLon.getText()));
+			
 			Lumiere.lumiereObjet(cube.getCube());
 
 			Main.listeSolides.add(cube);
@@ -264,15 +272,15 @@ public class Controller {
 			sphere.virtualCentre = new Vector3d(Double.valueOf(txtX.getText()), Double.valueOf(txtY.getText()),
 					Double.valueOf(txtZ.getText()));
 
+			sphere.setVitesse(new Vector3d(Double.valueOf(txtX.getText())/-10, Double.valueOf(txtY.getText())/-10, Double.valueOf(txtZ.getText())/-10));
+			sphere.setMasse(Double.valueOf(txtLon.getText()));
+			
 			Lumiere.lumiereObjet(sphere.getSphere());
 
 			Main.listeSolides.add(sphere);
 			Main.listeNoms.add(txtNom.getText());
 			Main.mapSolideNom.put(txtNom.getText(), sphere);
 			Main.update(Main.listeSolides, Color.WHITE);
-
-//			Solide.creeForme(sphere.getSphere(), pane, Double.valueOf(txtX.getText()) + 300,
-//					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
 		}
 		else if (txtTitreParam.getText().toLowerCase().contains("cône")) {
 			Cone cone = new Cone(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()), Main.FONT_SIZE);
@@ -280,20 +288,23 @@ public class Controller {
 			cone.virtualCentre = new Vector3d(Double.valueOf(txtX.getText()), Double.valueOf(txtY.getText()),
 					Double.valueOf(txtZ.getText()));
 
+			cone.setVitesse(new Vector3d(Double.valueOf(txtX.getText())/-10, Double.valueOf(txtY.getText())/-10, Double.valueOf(txtZ.getText())/-10));
+			cone.setMasse(Double.valueOf(txtLon.getText()));
+			
 			Lumiere.lumiereObjet(cone.getCone());
 
 			Main.listeSolides.add(cone);
 			Main.listeNoms.add(txtNom.getText());
 			Main.mapSolideNom.put(txtNom.getText(), cone);
 			Main.update(Main.listeSolides, Color.WHITE);
-
-//			Solide.creeForme(cone.getCone(), pane, Double.valueOf(txtX.getText()) + 300,
-//					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
 		}
 		else if (txtTitreParam.getText().toLowerCase().contains("cylindre")) {
 			Cylindre cylindre = new Cylindre(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()),
 					Main.FONT_SIZE);
 
+			cylindre.setVitesse(new Vector3d(Double.valueOf(txtX.getText())/-10, Double.valueOf(txtY.getText())/-10, Double.valueOf(txtZ.getText())/-10));
+			cylindre.setMasse(Double.valueOf(txtLon.getText()));
+			
 			cylindre.virtualCentre = new Vector3d(Double.valueOf(txtX.getText()), Double.valueOf(txtY.getText()),
 					Double.valueOf(txtZ.getText()));
 
@@ -303,9 +314,6 @@ public class Controller {
 			Main.listeNoms.add(txtNom.getText());
 			Main.mapSolideNom.put(txtNom.getText(), cylindre);
 			Main.update(Main.listeSolides, Color.WHITE);
-
-//			Solide.creeForme(cylindre.getCylindre(), pane, Double.valueOf(txtX.getText()) + 300,
-//					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
 		}
 
 		if (Main.DEBUG_MODE) System.out.println(txtLon.getText() + " " + txtLar.getText() + " " + txtHau.getText());
@@ -322,97 +330,90 @@ public class Controller {
 	public EventHandler<KeyEvent> rotationKey() {
 		return new EventHandler<KeyEvent>() {
 
+			@SuppressWarnings("unchecked")
 			@Override
 			public void handle(KeyEvent arg0) {
 				Main.root.requestFocus();
-				
+
 				double posNeg = arg0.isShiftDown() ? -1 : 1;
 
-//				ArrayList<Point> tousPoints = new ArrayList<Point>();
-//				if (arg0.isControlDown()) {
-//					//D�place les solides s�lectionn�s
-//					for (String s : lstView.getSelectionModel().getSelectedItems()) {
-//						tousPoints.addAll(Main.mapSolideNom.get(s).getSolide());
-//						if (Main.DEBUG_MODE) System.out.println(tousPoints.size());
-//					}
-//				}
-//				else {
-//					//Sinon d�place tous les solides
-//					for (Solide s : Main.listeSolides) {
-//						tousPoints.addAll(s.getSolide());
-//						if (Main.DEBUG_MODE) System.out.println(tousPoints.size());
-//					}
-//				}
-//				
-//
-//				Solide tousSolides = new Solide();
-//				tousSolides.setSolide(tousPoints);
+				if (lstView == null) {
+					lstView = (ListView<String>) ((VBox) Main.root.getRight()).getChildren().get(1);
+					lstView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+					lstView.setContextMenu(creeContextMenu());
+				}
+
+				if (arg0.getCode() == KeyCode.P) {
+					if (loop == null) return;
+					if (loop.getStatus().equals(Status.RUNNING)) loop.pause();
+					else loop.play();
+				}
 
 				for (Solide tousSolides : Main.listeSolides) {
 					if (arg0.getCode() == KeyCode.X) {
 						tousSolides.rotate(ROTATION_ANGLE * posNeg, 0, 0);
 						Main.update(Main.listeSolides, Color.WHITE);
-						
+
 						if (Main.DEBUG_MODE) System.out.println("x");
 					}
 					else if (arg0.getCode() == KeyCode.C) {
 						tousSolides.rotate(0, ROTATION_ANGLE * posNeg, 0);
 						Main.update(Main.listeSolides, Color.WHITE);
-						
+
 						if (Main.DEBUG_MODE) System.out.println("y");
 					}
 					else if (arg0.getCode() == KeyCode.Z) {
 						tousSolides.rotate(0, 0, ROTATION_ANGLE * posNeg);
 						Main.update(Main.listeSolides, Color.WHITE);
-						
+
 						if (Main.DEBUG_MODE) System.out.println("z");
 					}
-					else if (arg0.getCode() == KeyCode.W) {
-						// FIXME Ne fait pas de zoom, augmente seulement la taille de police au lieu de
-						// faire augmenter la taille de la forme
+
+					if (Main.DEBUG_MODE)
+						System.out.println("LstView indices " + lstView.getSelectionModel().getSelectedIndices());
+					if (!lstView.getSelectionModel().getSelectedIndices()
+							.contains(Main.listeSolides.indexOf(tousSolides)))
+						continue;
+
+					if (arg0.getCode() == KeyCode.W) {
 						tousSolides.deplacement(new Vector3d(0, 0, DEPLACEMENT_CENTRE));
 						Main.update(Main.listeSolides, Color.WHITE);
-						
+
 						if (Main.DEBUG_MODE) System.out.println("w");
 					}
 					else if (arg0.getCode() == KeyCode.S) {
-						// FIXME
 						tousSolides.deplacement(new Vector3d(0, 0, -DEPLACEMENT_CENTRE));
 						Main.update(Main.listeSolides, Color.WHITE);
-						
+
 						if (Main.DEBUG_MODE) System.out.println("s");
+					}
+					else if (arg0.getCode() == KeyCode.UP) {
+						tousSolides.deplacement(new Vector3d(0, -DEPLACEMENT_CENTRE, 0));
+						Main.update(Main.listeSolides, Color.WHITE);
+
+						if (Main.DEBUG_MODE) System.out.println("^");
+					}
+					else if (arg0.getCode() == KeyCode.DOWN) {
+						tousSolides.deplacement(new Vector3d(0, DEPLACEMENT_CENTRE, 0));
+						Main.update(Main.listeSolides, Color.WHITE);
+
+						if (Main.DEBUG_MODE) System.out.println("v");
+					}
+					else if (arg0.getCode() == KeyCode.LEFT) {
+						tousSolides.deplacement(new Vector3d(-DEPLACEMENT_CENTRE, 0, 0));
+						Main.update(Main.listeSolides, Color.WHITE);
+
+						if (Main.DEBUG_MODE) System.out.println("<");
+					}
+					else if (arg0.getCode() == KeyCode.RIGHT) {
+						tousSolides.deplacement(new Vector3d(DEPLACEMENT_CENTRE, 0, 0));
+						Main.update(Main.listeSolides, Color.WHITE);
+
+						if (Main.DEBUG_MODE) System.out.println(">");
 					}
 					else {
 						break;
 					}
-				}
-
-				if (arg0.getCode() == KeyCode.UP) {
-					Main.renderingCentre.add(new Vector3d(0, -DEPLACEMENT_CENTRE, 0));
-					Main.update(Main.listeSolides, Color.WHITE);
-					
-					if (Main.DEBUG_MODE) System.out.println("^");
-				}
-				else if (arg0.getCode() == KeyCode.DOWN) {
-					Main.renderingCentre.add(new Vector3d(0, DEPLACEMENT_CENTRE, 0));
-					Main.update(Main.listeSolides, Color.WHITE);
-					
-					if (Main.DEBUG_MODE) System.out.println("v");
-				}
-				else if (arg0.getCode() == KeyCode.LEFT) {
-					Main.renderingCentre.add(new Vector3d(-DEPLACEMENT_CENTRE, 0, 0));
-					Main.update(Main.listeSolides, Color.WHITE);
-					
-					if (Main.DEBUG_MODE) System.out.println("<");
-				}
-				else if (arg0.getCode() == KeyCode.RIGHT) {
-					Main.renderingCentre.add(new Vector3d(DEPLACEMENT_CENTRE, 0, 0));
-					Main.update(Main.listeSolides, Color.WHITE);
-					
-					if (Main.DEBUG_MODE) System.out.println(">");
-				}
-				else {
-					return;
 				}
 			}
 
@@ -455,11 +456,12 @@ public class Controller {
 				}
 			}
 		});
-		
+
 		lstView.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
 			@Override
 			public void handle(ContextMenuEvent arg0) {
-				if (Main.DEBUG_MODE) System.out.println("lstview size " + lstView.getSelectionModel().getSelectedItems().size());
+				if (Main.DEBUG_MODE)
+					System.out.println("lstview size " + lstView.getSelectionModel().getSelectedItems().size());
 				if (lstView.getSelectionModel().getSelectedItems().size() == 0) ctxtMenuListObj.hide();
 				ArrayList<Solide> tousSolides = new ArrayList<Solide>();
 
@@ -472,47 +474,47 @@ public class Controller {
 			}
 		});
 
-		//Shortcut Delete Object
+		// Shortcut Delete Object
 		lstView.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent e) {
 				if (e.getCode() != KeyCode.DELETE) return;
 
 				ObservableList<Integer> selectedIndices = lstView.getSelectionModel().getSelectedIndices();
-			    for (int i = selectedIndices.size() - 1; i >= 0; i--) {
-			        int selectedIndex = selectedIndices.get(i);
-			        String s = lstView.getItems().get(selectedIndex);
-			        if (Main.DEBUG_MODE) System.out.println(s + " selected");
-			        // Enlève le(s) solide(s) de toutes les listes
-			        Main.listeSolides.remove(Main.mapSolideNom.get(s));
-			        Main.listeNoms.remove(s);
-			        // Clean unused data
-			        Main.mapSolideNom.get(s).getSolide().removeAll(Main.mapSolideNom.get(s).getSolide());
-			        Main.mapSolideNom.remove(s);
-			    }
-			    
-			    lstView.getSelectionModel().clearSelection(); // clear the selection model
-			    
-			    // Enlève tous les caractères, car ils seront réinitialisés
-			    ((Pane) Main.root.getCenter()).getChildren().removeAll((Pane) Main.root.getCenter());
-			    // Set la liste à la nouvelle valeur sans le(s) solide(s)
-			    lstView.setItems(Main.listeNoms);
-			    
-			    // Rajoute les solides à la scène
-			    Main.update(Main.listeSolides, Color.WHITE);
-			    
-			    if (Main.DEBUG_MODE) System.out.println("lstView : " + lstView.getChildrenUnmodifiable().size());
-			    if (Main.DEBUG_MODE) System.out.println("lstNom : " + Main.listeNoms);
-			    if (Main.DEBUG_MODE) System.out.println("lstSolide : " + Main.listeSolides.size());
-			    
-			    lstView.getSelectionModel().clearSelection(); // clear the selection model again
+				for (int i = selectedIndices.size() - 1; i >= 0; i--) {
+					int selectedIndex = selectedIndices.get(i);
+					String s = lstView.getItems().get(selectedIndex);
+					if (Main.DEBUG_MODE) System.out.println(s + " selected");
+					// Enlève le(s) solide(s) de toutes les listes
+					Main.listeSolides.remove(Main.mapSolideNom.get(s));
+					Main.listeNoms.remove(s);
+					// Clean unused data
+					Main.mapSolideNom.get(s).getSolide().removeAll(Main.mapSolideNom.get(s).getSolide());
+					Main.mapSolideNom.remove(s);
+				}
+
+				lstView.getSelectionModel().clearSelection(); // clear the selection model
+
+				// Enlève tous les caractères, car ils seront réinitialisés
+				((Pane) Main.root.getCenter()).getChildren().removeAll((Pane) Main.root.getCenter());
+				// Set la liste à la nouvelle valeur sans le(s) solide(s)
+				lstView.setItems(Main.listeNoms);
+
+				// Rajoute les solides à la scène
+				Main.update(Main.listeSolides, Color.WHITE);
+
+				if (Main.DEBUG_MODE) System.out.println("lstView : " + lstView.getChildrenUnmodifiable().size());
+				if (Main.DEBUG_MODE) System.out.println("lstNom : " + Main.listeNoms);
+				if (Main.DEBUG_MODE) System.out.println("lstSolide : " + Main.listeSolides.size());
+
+				lstView.getSelectionModel().clearSelection(); // clear the selection model again
 			}
 		});
 	}
 
 	protected ContextMenu creeContextMenu() {
 		ctxtMenuListObj.getItems().addAll(ctxtMenuItemEdit, ctxtMenuItemCombine, ctxtMenuItemDelete);
-		
+
 		ctxtMenuItemCombine.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
@@ -522,25 +524,25 @@ public class Controller {
 				int xTotal = 0;
 				int yTotal = 0;
 				int zTotal = 0;
-				
+
 				ObservableList<Integer> selectedIndices = lstView.getSelectionModel().getSelectedIndices();
 				idxSize = selectedIndices.size();
 				if (idxSize < 2) return;
-			    for (int i = selectedIndices.size() - 1; i >= 0; i--) {
-			        int selectedIndex = selectedIndices.get(i);
-			        String s = lstView.getItems().get(selectedIndex);
-			        if (Main.DEBUG_MODE) System.out.println(s + " selected");
-			        
-			        for(Point p : Main.mapSolideNom.get(s).getSolide()) {
-			        	p.getCoordonnee().sub(Main.mapSolideNom.get(s).virtualCentre);
-			        	tousSolides.getSolide().add(p);
-			        }
-			        
-			        //tousSolides.getSolide().addAll(Main.mapSolideNom.get(s).getSolide());
-			        
-			        xTotal -= Main.mapSolideNom.get(s).virtualCentre.x;
-			        yTotal -= Main.mapSolideNom.get(s).virtualCentre.y;
-			        zTotal -= Main.mapSolideNom.get(s).virtualCentre.z;
+				for (int i = selectedIndices.size() - 1; i >= 0; i--) {
+					int selectedIndex = selectedIndices.get(i);
+					String s = lstView.getItems().get(selectedIndex);
+					if (Main.DEBUG_MODE) System.out.println(s + " selected");
+
+					for (Point p : Main.mapSolideNom.get(s).getSolide()) {
+						p.getCoordonnee().sub(Main.mapSolideNom.get(s).virtualCentre);
+						tousSolides.getSolide().add(p);
+					}
+
+					// tousSolides.getSolide().addAll(Main.mapSolideNom.get(s).getSolide());
+
+					xTotal -= Main.mapSolideNom.get(s).virtualCentre.x;
+					yTotal -= Main.mapSolideNom.get(s).virtualCentre.y;
+					zTotal -= Main.mapSolideNom.get(s).virtualCentre.z;
 
 					// Enlève le(s) solide(s) de toutes les listes
 					Main.listeSolides.remove(Main.mapSolideNom.get(s));
@@ -549,19 +551,19 @@ public class Controller {
 					Main.mapSolideNom.get(s).getSolide().removeAll(Main.mapSolideNom.get(s).getSolide());
 					Main.mapSolideNom.remove(s);
 				}
-				
-			    lstView.getSelectionModel().clearSelection(); // clear the selection model
-			    
+
+				lstView.getSelectionModel().clearSelection(); // clear the selection model
+
 				// Enlève tous les caractères, car ils seront réinitialisés
 				((Pane) Main.root.getCenter()).getChildren().removeAll((Pane) Main.root.getCenter());
-								
-				tousSolides.virtualCentre = new Vector3d(xTotal/idxSize, yTotal/idxSize, zTotal/idxSize);				
+
+				tousSolides.virtualCentre = new Vector3d(xTotal / idxSize, yTotal / idxSize, zTotal / idxSize);
 				Lumiere.lumiereObjet(tousSolides.getSolide());
 
 				Main.listeSolides.add(tousSolides);
 				Main.listeNoms.add(solideName);
 				Main.mapSolideNom.put(solideName, tousSolides);
-					
+
 				// Set la liste à la nouvelle valeur sans le(s) solide(s)
 				lstView.setItems(Main.listeNoms);
 
@@ -571,7 +573,7 @@ public class Controller {
 				if (Main.DEBUG_MODE) System.out.println("lstView : " + lstView.getChildrenUnmodifiable().size());
 				if (Main.DEBUG_MODE) System.out.println("lstNom : " + Main.listeNoms);
 				if (Main.DEBUG_MODE) System.out.println("lstSloide : " + Main.listeSolides.size());
-				
+
 				lstView.getSelectionModel().clearSelection(); // clear the selection model again
 			}
 		});
@@ -599,37 +601,37 @@ public class Controller {
 		ctxtMenuItemDelete.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-			    ObservableList<Integer> selectedIndices = lstView.getSelectionModel().getSelectedIndices();
-			    for (int i = selectedIndices.size() - 1; i >= 0; i--) {
-			        int selectedIndex = selectedIndices.get(i);
-			        String s = lstView.getItems().get(selectedIndex);
-			        if (Main.DEBUG_MODE) System.out.println(s + " selected");
-			        // Enlève le(s) solide(s) de toutes les listes
-			        Main.listeSolides.remove(Main.mapSolideNom.get(s));
-			        Main.listeNoms.remove(s);
-			        // Clean unused data
-			        Main.mapSolideNom.get(s).getSolide().removeAll(Main.mapSolideNom.get(s).getSolide());
-			        Main.mapSolideNom.remove(s);
-			    }
-			    
-			    lstView.getSelectionModel().clearSelection(); // clear the selection model
-			    
-			    // Enlève tous les caractères, car ils seront réinitialisés
-			    ((Pane) Main.root.getCenter()).getChildren().removeAll((Pane) Main.root.getCenter());
-			    // Set la liste à la nouvelle valeur sans le(s) solide(s)
-			    lstView.setItems(Main.listeNoms);
-			    
-			    // Rajoute les solides à la scène
-			    Main.update(Main.listeSolides, Color.WHITE);
-			    
-			    if (Main.DEBUG_MODE) System.out.println("lstView : " + lstView.getChildrenUnmodifiable().size());
-			    if (Main.DEBUG_MODE) System.out.println("lstNom : " + Main.listeNoms);
-			    if (Main.DEBUG_MODE) System.out.println("lstSolide : " + Main.listeSolides.size());
-			    
-			    lstView.getSelectionModel().clearSelection(); // clear the selection model again
+				ObservableList<Integer> selectedIndices = lstView.getSelectionModel().getSelectedIndices();
+				for (int i = selectedIndices.size() - 1; i >= 0; i--) {
+					int selectedIndex = selectedIndices.get(i);
+					String s = lstView.getItems().get(selectedIndex);
+					if (Main.DEBUG_MODE) System.out.println(s + " selected");
+					// Enlève le(s) solide(s) de toutes les listes
+					Main.listeSolides.remove(Main.mapSolideNom.get(s));
+					Main.listeNoms.remove(s);
+					// Clean unused data
+					Main.mapSolideNom.get(s).getSolide().removeAll(Main.mapSolideNom.get(s).getSolide());
+					Main.mapSolideNom.remove(s);
+				}
+
+				lstView.getSelectionModel().clearSelection(); // clear the selection model
+
+				// Enlève tous les caractères, car ils seront réinitialisés
+				((Pane) Main.root.getCenter()).getChildren().removeAll((Pane) Main.root.getCenter());
+				// Set la liste à la nouvelle valeur sans le(s) solide(s)
+				lstView.setItems(Main.listeNoms);
+
+				// Rajoute les solides à la scène
+				Main.update(Main.listeSolides, Color.WHITE);
+
+				if (Main.DEBUG_MODE) System.out.println("lstView : " + lstView.getChildrenUnmodifiable().size());
+				if (Main.DEBUG_MODE) System.out.println("lstNom : " + Main.listeNoms);
+				if (Main.DEBUG_MODE) System.out.println("lstSolide : " + Main.listeSolides.size());
+
+				lstView.getSelectionModel().clearSelection(); // clear the selection model again
 			}
 		});
-		
+
 		return ctxtMenuListObj;
 	}
 
@@ -692,33 +694,73 @@ public class Controller {
 
 		// Rotate solide
 		solide.rotateSelf(Double.valueOf(txtX.getText()) * Math.PI / 180,
-						  Double.valueOf(txtY.getText()) * Math.PI / 180, 
-						  Double.valueOf(txtZ.getText()) * Math.PI / 180);
+				Double.valueOf(txtY.getText()) * Math.PI / 180, Double.valueOf(txtZ.getText()) * Math.PI / 180);
+
+		// Check si le nom du solide est valide
+		for (String s : Main.listeNoms) {
+			if (txtNom.getText().equals(s) && !lstView.getSelectionModel().getSelectedIndices().get(0)
+					.equals(Main.listeSolides.indexOf(solide))) {
+				Alert alert = new Alert(AlertType.WARNING);
+				alert.setContentText("Le nom des solides doit être unique!");
+				alert.show();
+				return;
+			}
+		}
 
 		// Rename solide
 		// Enlève le solide de la liste
-        Main.listeNoms.remove(solideNom);
-        lstView.getSelectionModel().clearSelection(); // clear the selection model
-        solideNom = txtNom.getText();
-        // Re-add dans listes
-        Main.listeNoms.add(solideNom);
-        // Update HashKey
-        Main.mapSolideNom.put(solideNom, solide);
-        // Update ListView
-        lstView.setItems(Main.listeNoms);
-        
+		Main.listeNoms.remove(solideNom);
+		lstView.getSelectionModel().clearSelection(); // clear the selection model
+		solideNom = txtNom.getText();
+		// Re-add dans listes
+		Main.listeNoms.add(solideNom);
+		// Update HashKey
+		Main.mapSolideNom.put(solideNom, solide);
+		// Update ListView
+		lstView.setItems(Main.listeNoms);
+
 		Main.update(Main.listeSolides, Color.WHITE);
 
 		// Close stage after each edit because selection is cleared
-	    Stage stage = (Stage) btnClose.getScene().getWindow();
-	    stage.close();
-		
-		if (Main.DEBUG_MODE)
-			System.out.println("x : " + Double.valueOf(txtX.getText()) * Math.PI / 180 + " rad");
-		if (Main.DEBUG_MODE)
-			System.out.println("y : " + Double.valueOf(txtY.getText()) * Math.PI / 180 + " rad");
-		if (Main.DEBUG_MODE)
-			System.out.println("z : " + Double.valueOf(txtZ.getText()) * Math.PI / 180 + " rad");
+		Stage stage = (Stage) btnClose.getScene().getWindow();
+		stage.close();
+
+		if (Main.DEBUG_MODE) System.out.println("x : " + Double.valueOf(txtX.getText()) * Math.PI / 180 + " rad");
+		if (Main.DEBUG_MODE) System.out.println("y : " + Double.valueOf(txtY.getText()) * Math.PI / 180 + " rad");
+		if (Main.DEBUG_MODE) System.out.println("z : " + Double.valueOf(txtZ.getText()) * Math.PI / 180 + " rad");
+	}
+
+	/**
+	 * Termine le programme.
+	 */
+	@FXML
+	protected void simulate() {
+		if (loop == null) {
+			loop = new Timeline(new KeyFrame(Duration.millis(75), new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent arg0) {
+					if (Main.listeSolides.size() > 0) {
+						for (Solide solide : Main.listeSolides) {
+							solide.deplacementTime(Main.SECONDS_PER_UPDATE);
+						}
+
+						Main.updateCollision();
+					}
+				}
+			}));
+			loop.setCycleCount(Timeline.INDEFINITE);
+		}
+		if (Main.listeSolides.size() < 2) {
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setContentText("Il doit y avoir au moins deux corps pour démarrer la simulation.");
+			alert.show();
+			return;
+		}
+		if (loop.getStatus().equals(Status.RUNNING)) loop.pause();
+		else loop.play();
+
+		if (Main.DEBUG_MODE) System.out.println("Timeline on? " + loop.getStatus().equals(Status.RUNNING));
 	}
 
 	/**
