@@ -59,6 +59,7 @@ public class Controller {
 
 	private MenuItem ctxtMenuItemEdit = new MenuItem("Éditer");
 	private MenuItem ctxtMenuItemCombine = new MenuItem("Combiner");
+	private MenuItem ctxtMenuItemProperties = new MenuItem("Propriétés");
 	private MenuItem ctxtMenuItemDelete = new MenuItem("Supprimer");
 	private ContextMenu ctxtMenuListObj = new ContextMenu();
 	private Timeline loop;
@@ -114,6 +115,12 @@ public class Controller {
 		}
 
 		lstView.setItems(Main.listeNoms);
+		
+		if (loop == null) {
+			loop = new Timeline(new KeyFrame(Duration.millis(75), loopEvent()));
+			loop.setCycleCount(Timeline.INDEFINITE);
+		}
+		loop.pause();
 	}
 
 	/**
@@ -185,7 +192,8 @@ public class Controller {
 
 		stage.setScene(scene);
 		stage.setTitle("Paramètres du " + ((MenuItem) arg0.getSource()).getText());
-		if (((MenuItem) arg0.getSource()).getText().equals("Sphere")) stage.setTitle("Paramètres de la Sphère");
+		if (((MenuItem) arg0.getSource()).getText().equals("Sphere"))
+			stage.setTitle("Paramètres de la Sphère");
 		stage.setResizable(false);
 		stage.show();
 	}
@@ -198,25 +206,35 @@ public class Controller {
 	@FXML
 	protected void creeSolide() {
 		// Ne fait rien s'il y a des paramètres fautifs
-		if (txtLon.getText().toCharArray().length == 0) return;
+		if (txtLon.getText().toCharArray().length == 0)
+			return;
 		for (char c : txtLon.getText().toCharArray()) {
-			if (!Character.isDigit(c) && c != '.') return;
+			if (!Character.isDigit(c) && c != '.')
+				return;
 		}
-		if (txtLar.getText().toCharArray().length == 0) return;
+		if (txtLar.getText().toCharArray().length == 0)
+			return;
 		for (char c : txtLar.getText().toCharArray()) {
-			if (!Character.isDigit(c) && c != '.') return;
+			if (!Character.isDigit(c) && c != '.')
+				return;
 		}
-		if (txtX.getText().toCharArray().length == 0) return;
+		if (txtX.getText().toCharArray().length == 0)
+			return;
 		for (char c : txtX.getText().toCharArray()) {
-			if (!Character.isDigit(c) && c != '.' && c != '-') return;
+			if (!Character.isDigit(c) && c != '.' && c != '-')
+				return;
 		}
-		if (txtY.getText().toCharArray().length == 0) return;
+		if (txtY.getText().toCharArray().length == 0)
+			return;
 		for (char c : txtY.getText().toCharArray()) {
-			if (!Character.isDigit(c) && c != '.' && c != '-') return;
+			if (!Character.isDigit(c) && c != '.' && c != '-')
+				return;
 		}
-		if (txtZ.getText().toCharArray().length == 0) return;
+		if (txtZ.getText().toCharArray().length == 0)
+			return;
 		for (char c : txtZ.getText().toCharArray()) {
-			if (!Character.isDigit(c) && c != '.' && c != '-') return;
+			if (!Character.isDigit(c) && c != '.' && c != '-')
+				return;
 		}
 
 		// Initialise la ListView des solides si ceci n'a pas déjà été fait
@@ -225,7 +243,8 @@ public class Controller {
 			lstView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 			lstView.setContextMenu(creeContextMenu());
 
-			if (Main.DEBUG_MODE) System.out.println("Set ListView");
+			if (Main.DEBUG_MODE)
+				System.out.println("Set ListView");
 		}
 
 		lstView = (ListView<String>) ((VBox) Main.root.getRight()).getChildren().get(1);
@@ -241,9 +260,11 @@ public class Controller {
 		}
 
 		if (txtTitreParam.getText().toLowerCase().contains("cube")) {
-			if (txtHau.getText().toCharArray().length == 0) return;
+			if (txtHau.getText().toCharArray().length == 0)
+				return;
 			for (char c : txtHau.getText().toCharArray()) {
-				if (!Character.isDigit(c) && c != '.') return;
+				if (!Character.isDigit(c) && c != '.')
+					return;
 			}
 
 			Cube cube = new Cube(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()),
@@ -252,9 +273,6 @@ public class Controller {
 			cube.virtualCentre = new Vector3d(Double.valueOf(txtX.getText()), Double.valueOf(txtY.getText()),
 					Double.valueOf(txtZ.getText()));
 
-			cube.setVitesse(new Vector3d(Double.valueOf(txtX.getText())/-10, Double.valueOf(txtY.getText())/-10, Double.valueOf(txtZ.getText())/-10));
-			cube.setMasse(Double.valueOf(txtLon.getText()));
-			
 			Lumiere.lumiereObjet(cube.getCube());
 
 			Main.listeSolides.add(cube);
@@ -264,47 +282,35 @@ public class Controller {
 
 //			Solide.creeForme(cube.getCube(), pane, Double.valueOf(txtX.getText()) + 300,
 //					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
-		}
-		else if (txtTitreParam.getText().toLowerCase().contains("sphère")) {
+		} else if (txtTitreParam.getText().toLowerCase().contains("sphère")) {
 			Sphere sphere = new Sphere(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()),
 					Main.FONT_SIZE);
 
 			sphere.virtualCentre = new Vector3d(Double.valueOf(txtX.getText()), Double.valueOf(txtY.getText()),
 					Double.valueOf(txtZ.getText()));
 
-			sphere.setVitesse(new Vector3d(Double.valueOf(txtX.getText())/-10, Double.valueOf(txtY.getText())/-10, Double.valueOf(txtZ.getText())/-10));
-			sphere.setMasse(Double.valueOf(txtLon.getText()));
-			
 			Lumiere.lumiereObjet(sphere.getSphere());
 
 			Main.listeSolides.add(sphere);
 			Main.listeNoms.add(txtNom.getText());
 			Main.mapSolideNom.put(txtNom.getText(), sphere);
 			Main.update(Main.listeSolides, Color.WHITE);
-		}
-		else if (txtTitreParam.getText().toLowerCase().contains("cône")) {
+		} else if (txtTitreParam.getText().toLowerCase().contains("cône")) {
 			Cone cone = new Cone(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()), Main.FONT_SIZE);
 
 			cone.virtualCentre = new Vector3d(Double.valueOf(txtX.getText()), Double.valueOf(txtY.getText()),
 					Double.valueOf(txtZ.getText()));
 
-			cone.setVitesse(new Vector3d(Double.valueOf(txtX.getText())/-10, Double.valueOf(txtY.getText())/-10, Double.valueOf(txtZ.getText())/-10));
-			cone.setMasse(Double.valueOf(txtLon.getText()));
-			
 			Lumiere.lumiereObjet(cone.getCone());
 
 			Main.listeSolides.add(cone);
 			Main.listeNoms.add(txtNom.getText());
 			Main.mapSolideNom.put(txtNom.getText(), cone);
 			Main.update(Main.listeSolides, Color.WHITE);
-		}
-		else if (txtTitreParam.getText().toLowerCase().contains("cylindre")) {
+		} else if (txtTitreParam.getText().toLowerCase().contains("cylindre")) {
 			Cylindre cylindre = new Cylindre(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()),
 					Main.FONT_SIZE);
 
-			cylindre.setVitesse(new Vector3d(Double.valueOf(txtX.getText())/-10, Double.valueOf(txtY.getText())/-10, Double.valueOf(txtZ.getText())/-10));
-			cylindre.setMasse(Double.valueOf(txtLon.getText()));
-			
 			cylindre.virtualCentre = new Vector3d(Double.valueOf(txtX.getText()), Double.valueOf(txtY.getText()),
 					Double.valueOf(txtZ.getText()));
 
@@ -316,8 +322,10 @@ public class Controller {
 			Main.update(Main.listeSolides, Color.WHITE);
 		}
 
-		if (Main.DEBUG_MODE) System.out.println(txtLon.getText() + " " + txtLar.getText() + " " + txtHau.getText());
-		if (Main.DEBUG_MODE) System.out.println(Main.listeSolides.size());
+		if (Main.DEBUG_MODE)
+			System.out.println(txtLon.getText() + " " + txtLar.getText() + " " + txtHau.getText());
+		if (Main.DEBUG_MODE)
+			System.out.println(Main.listeSolides.size());
 	}
 
 	/**
@@ -344,30 +352,34 @@ public class Controller {
 				}
 
 				if (arg0.getCode() == KeyCode.P) {
-					if (loop == null) return;
-					if (loop.getStatus().equals(Status.RUNNING)) loop.pause();
-					else loop.play();
+					if (loop == null)
+						return;
+					if (loop.getStatus().equals(Status.RUNNING))
+						loop.pause();
+					else
+						loop.play();
 				}
 
 				for (Solide tousSolides : Main.listeSolides) {
-					if (arg0.getCode() == KeyCode.X) {
-						tousSolides.rotate(ROTATION_ANGLE * posNeg, 0, 0);
-						Main.update(Main.listeSolides, Color.WHITE);
-
-						if (Main.DEBUG_MODE) System.out.println("x");
+					if (!arg0.isControlDown()) {
+						if (arg0.getCode() == KeyCode.X) {
+							tousSolides.rotate(ROTATION_ANGLE * posNeg, 0, 0);
+							Main.update(Main.listeSolides, Color.WHITE);
+	
+							if (Main.DEBUG_MODE) System.out.println("x");
+						} else if (arg0.getCode() == KeyCode.C) {
+							tousSolides.rotate(0, ROTATION_ANGLE * posNeg, 0);
+							Main.update(Main.listeSolides, Color.WHITE);
+	
+							if (Main.DEBUG_MODE) System.out.println("y");
+						} else if (arg0.getCode() == KeyCode.Z) {
+							tousSolides.rotate(0, 0, ROTATION_ANGLE * posNeg);
+							Main.update(Main.listeSolides, Color.WHITE);
+	
+							if (Main.DEBUG_MODE) System.out.println("z");
+						}
 					}
-					else if (arg0.getCode() == KeyCode.C) {
-						tousSolides.rotate(0, ROTATION_ANGLE * posNeg, 0);
-						Main.update(Main.listeSolides, Color.WHITE);
-
-						if (Main.DEBUG_MODE) System.out.println("y");
-					}
-					else if (arg0.getCode() == KeyCode.Z) {
-						tousSolides.rotate(0, 0, ROTATION_ANGLE * posNeg);
-						Main.update(Main.listeSolides, Color.WHITE);
-
-						if (Main.DEBUG_MODE) System.out.println("z");
-					}
+					
 
 					if (Main.DEBUG_MODE)
 						System.out.println("LstView indices " + lstView.getSelectionModel().getSelectedIndices());
@@ -375,43 +387,62 @@ public class Controller {
 							.contains(Main.listeSolides.indexOf(tousSolides)))
 						continue;
 
+					if (arg0.isControlDown()) {
+						if (arg0.getCode() == KeyCode.X) {
+							tousSolides.rotateSelf(ROTATION_ANGLE * posNeg, 0, 0);
+							Main.update(Main.listeSolides, Color.WHITE);
+	
+							if (Main.DEBUG_MODE) System.out.println("x");
+						} else if (arg0.getCode() == KeyCode.C) {
+							tousSolides.rotateSelf(0, ROTATION_ANGLE * posNeg, 0);
+							Main.update(Main.listeSolides, Color.WHITE);
+	
+							if (Main.DEBUG_MODE) System.out.println("y");
+						} else if (arg0.getCode() == KeyCode.Z) {
+							tousSolides.rotateSelf(0, 0, ROTATION_ANGLE * posNeg);
+							Main.update(Main.listeSolides, Color.WHITE);
+	
+							if (Main.DEBUG_MODE) System.out.println("z");
+						}
+					}
+					
 					if (arg0.getCode() == KeyCode.W) {
 						tousSolides.deplacement(new Vector3d(0, 0, DEPLACEMENT_CENTRE));
 						Main.update(Main.listeSolides, Color.WHITE);
 
-						if (Main.DEBUG_MODE) System.out.println("w");
-					}
-					else if (arg0.getCode() == KeyCode.S) {
+						if (Main.DEBUG_MODE)
+							System.out.println("w");
+					} else if (arg0.getCode() == KeyCode.S) {
 						tousSolides.deplacement(new Vector3d(0, 0, -DEPLACEMENT_CENTRE));
 						Main.update(Main.listeSolides, Color.WHITE);
 
-						if (Main.DEBUG_MODE) System.out.println("s");
-					}
-					else if (arg0.getCode() == KeyCode.UP) {
+						if (Main.DEBUG_MODE)
+							System.out.println("s");
+					} else if (arg0.getCode() == KeyCode.UP) {
 						tousSolides.deplacement(new Vector3d(0, -DEPLACEMENT_CENTRE, 0));
 						Main.update(Main.listeSolides, Color.WHITE);
 
-						if (Main.DEBUG_MODE) System.out.println("^");
-					}
-					else if (arg0.getCode() == KeyCode.DOWN) {
+						if (Main.DEBUG_MODE)
+							System.out.println("^");
+					} else if (arg0.getCode() == KeyCode.DOWN) {
 						tousSolides.deplacement(new Vector3d(0, DEPLACEMENT_CENTRE, 0));
 						Main.update(Main.listeSolides, Color.WHITE);
 
-						if (Main.DEBUG_MODE) System.out.println("v");
-					}
-					else if (arg0.getCode() == KeyCode.LEFT) {
+						if (Main.DEBUG_MODE)
+							System.out.println("v");
+					} else if (arg0.getCode() == KeyCode.LEFT) {
 						tousSolides.deplacement(new Vector3d(-DEPLACEMENT_CENTRE, 0, 0));
 						Main.update(Main.listeSolides, Color.WHITE);
 
-						if (Main.DEBUG_MODE) System.out.println("<");
-					}
-					else if (arg0.getCode() == KeyCode.RIGHT) {
+						if (Main.DEBUG_MODE)
+							System.out.println("<");
+					} else if (arg0.getCode() == KeyCode.RIGHT) {
 						tousSolides.deplacement(new Vector3d(DEPLACEMENT_CENTRE, 0, 0));
 						Main.update(Main.listeSolides, Color.WHITE);
 
-						if (Main.DEBUG_MODE) System.out.println(">");
-					}
-					else {
+						if (Main.DEBUG_MODE)
+							System.out.println(">");
+					} else {
 						break;
 					}
 				}
@@ -446,7 +477,8 @@ public class Controller {
 				for (int i : lstView.getSelectionModel().getSelectedIndices()) {
 					String s = lstView.getItems().get(i);
 					tousSolides.add(Main.mapSolideNom.get(s));
-					if (Main.DEBUG_MODE) names.add(s);
+					if (Main.DEBUG_MODE)
+						names.add(s);
 				}
 				Main.updateSelective(tousSolides, Color.RED);
 				if (Main.DEBUG_MODE) {
@@ -462,7 +494,8 @@ public class Controller {
 			public void handle(ContextMenuEvent arg0) {
 				if (Main.DEBUG_MODE)
 					System.out.println("lstview size " + lstView.getSelectionModel().getSelectedItems().size());
-				if (lstView.getSelectionModel().getSelectedItems().size() == 0) ctxtMenuListObj.hide();
+				if (lstView.getSelectionModel().getSelectedItems().size() == 0)
+					ctxtMenuListObj.hide();
 				ArrayList<Solide> tousSolides = new ArrayList<Solide>();
 
 				for (int i : lstView.getSelectionModel().getSelectedIndices()) {
@@ -470,7 +503,8 @@ public class Controller {
 					tousSolides.add(Main.mapSolideNom.get(s));
 				}
 				Main.updateSelective(tousSolides, Color.RED);
-				if (Main.DEBUG_MODE) System.out.println("Colored");
+				if (Main.DEBUG_MODE)
+					System.out.println("Colored");
 			}
 		});
 
@@ -478,13 +512,15 @@ public class Controller {
 		lstView.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent e) {
-				if (e.getCode() != KeyCode.DELETE) return;
+				if (e.getCode() != KeyCode.DELETE)
+					return;
 
 				ObservableList<Integer> selectedIndices = lstView.getSelectionModel().getSelectedIndices();
 				for (int i = selectedIndices.size() - 1; i >= 0; i--) {
 					int selectedIndex = selectedIndices.get(i);
 					String s = lstView.getItems().get(selectedIndex);
-					if (Main.DEBUG_MODE) System.out.println(s + " selected");
+					if (Main.DEBUG_MODE)
+						System.out.println(s + " selected");
 					// Enlève le(s) solide(s) de toutes les listes
 					Main.listeSolides.remove(Main.mapSolideNom.get(s));
 					Main.listeNoms.remove(s);
@@ -503,9 +539,12 @@ public class Controller {
 				// Rajoute les solides à la scène
 				Main.update(Main.listeSolides, Color.WHITE);
 
-				if (Main.DEBUG_MODE) System.out.println("lstView : " + lstView.getChildrenUnmodifiable().size());
-				if (Main.DEBUG_MODE) System.out.println("lstNom : " + Main.listeNoms);
-				if (Main.DEBUG_MODE) System.out.println("lstSolide : " + Main.listeSolides.size());
+				if (Main.DEBUG_MODE)
+					System.out.println("lstView : " + lstView.getChildrenUnmodifiable().size());
+				if (Main.DEBUG_MODE)
+					System.out.println("lstNom : " + Main.listeNoms);
+				if (Main.DEBUG_MODE)
+					System.out.println("lstSolide : " + Main.listeSolides.size());
 
 				lstView.getSelectionModel().clearSelection(); // clear the selection model again
 			}
@@ -513,7 +552,8 @@ public class Controller {
 	}
 
 	protected ContextMenu creeContextMenu() {
-		ctxtMenuListObj.getItems().addAll(ctxtMenuItemEdit, ctxtMenuItemCombine, ctxtMenuItemDelete);
+		ctxtMenuListObj.getItems().addAll(ctxtMenuItemEdit, ctxtMenuItemCombine, ctxtMenuItemProperties,
+				ctxtMenuItemDelete);
 
 		ctxtMenuItemCombine.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -527,11 +567,13 @@ public class Controller {
 
 				ObservableList<Integer> selectedIndices = lstView.getSelectionModel().getSelectedIndices();
 				idxSize = selectedIndices.size();
-				if (idxSize < 2) return;
+				if (idxSize < 2)
+					return;
 				for (int i = selectedIndices.size() - 1; i >= 0; i--) {
 					int selectedIndex = selectedIndices.get(i);
 					String s = lstView.getItems().get(selectedIndex);
-					if (Main.DEBUG_MODE) System.out.println(s + " selected");
+					if (Main.DEBUG_MODE)
+						System.out.println(s + " selected");
 
 					for (Point p : Main.mapSolideNom.get(s).getSolide()) {
 						p.getCoordonnee().sub(Main.mapSolideNom.get(s).virtualCentre);
@@ -570,9 +612,12 @@ public class Controller {
 				// Rajoute les solides à la scène
 				Main.update(Main.listeSolides, Color.WHITE);
 
-				if (Main.DEBUG_MODE) System.out.println("lstView : " + lstView.getChildrenUnmodifiable().size());
-				if (Main.DEBUG_MODE) System.out.println("lstNom : " + Main.listeNoms);
-				if (Main.DEBUG_MODE) System.out.println("lstSloide : " + Main.listeSolides.size());
+				if (Main.DEBUG_MODE)
+					System.out.println("lstView : " + lstView.getChildrenUnmodifiable().size());
+				if (Main.DEBUG_MODE)
+					System.out.println("lstNom : " + Main.listeNoms);
+				if (Main.DEBUG_MODE)
+					System.out.println("lstSloide : " + Main.listeSolides.size());
 
 				lstView.getSelectionModel().clearSelection(); // clear the selection model again
 			}
@@ -598,6 +643,26 @@ public class Controller {
 			}
 		});
 
+		ctxtMenuItemProperties.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				URL url = getClass().getResource("FenetreProperties.fxml");
+				FXMLLoader fxmlLoader = new FXMLLoader(url);
+
+				BorderPane root;
+				try {
+					root = fxmlLoader.load();
+					Scene scene = new Scene(root);
+					stage.setScene(scene);
+					stage.setTitle("Propriétés de " + lstView.getSelectionModel().getSelectedItems().get(0));
+					stage.setResizable(false);
+					stage.show();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
 		ctxtMenuItemDelete.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
@@ -605,7 +670,8 @@ public class Controller {
 				for (int i = selectedIndices.size() - 1; i >= 0; i--) {
 					int selectedIndex = selectedIndices.get(i);
 					String s = lstView.getItems().get(selectedIndex);
-					if (Main.DEBUG_MODE) System.out.println(s + " selected");
+					if (Main.DEBUG_MODE)
+						System.out.println(s + " selected");
 					// Enlève le(s) solide(s) de toutes les listes
 					Main.listeSolides.remove(Main.mapSolideNom.get(s));
 					Main.listeNoms.remove(s);
@@ -624,9 +690,12 @@ public class Controller {
 				// Rajoute les solides à la scène
 				Main.update(Main.listeSolides, Color.WHITE);
 
-				if (Main.DEBUG_MODE) System.out.println("lstView : " + lstView.getChildrenUnmodifiable().size());
-				if (Main.DEBUG_MODE) System.out.println("lstNom : " + Main.listeNoms);
-				if (Main.DEBUG_MODE) System.out.println("lstSolide : " + Main.listeSolides.size());
+				if (Main.DEBUG_MODE)
+					System.out.println("lstView : " + lstView.getChildrenUnmodifiable().size());
+				if (Main.DEBUG_MODE)
+					System.out.println("lstNom : " + Main.listeNoms);
+				if (Main.DEBUG_MODE)
+					System.out.println("lstSolide : " + Main.listeSolides.size());
 
 				lstView.getSelectionModel().clearSelection(); // clear the selection model again
 			}
@@ -643,29 +712,41 @@ public class Controller {
 	@FXML
 	protected void editSolide() {
 		// Ne fait rien s'il y a des paramètres fautifs
-		if (txtLon.getText().toCharArray().length == 0) return;
+		if (txtLon.getText().toCharArray().length == 0)
+			return;
 		for (char c : txtLon.getText().toCharArray()) {
-			if (!Character.isDigit(c) && c != '.') return;
+			if (!Character.isDigit(c) && c != '.')
+				return;
 		}
-		if (txtLar.getText().toCharArray().length == 0) return;
+		if (txtLar.getText().toCharArray().length == 0)
+			return;
 		for (char c : txtLar.getText().toCharArray()) {
-			if (!Character.isDigit(c) && c != '.') return;
+			if (!Character.isDigit(c) && c != '.')
+				return;
 		}
-		if (txtHau.getText().toCharArray().length == 0) return;
+		if (txtHau.getText().toCharArray().length == 0)
+			return;
 		for (char c : txtHau.getText().toCharArray()) {
-			if (!Character.isDigit(c) && c != '.') return;
+			if (!Character.isDigit(c) && c != '.')
+				return;
 		}
-		if (txtX.getText().toCharArray().length == 0) return;
+		if (txtX.getText().toCharArray().length == 0)
+			return;
 		for (char c : txtX.getText().toCharArray()) {
-			if (!Character.isDigit(c) && c != '.' && c != '-') return;
+			if (!Character.isDigit(c) && c != '.' && c != '-')
+				return;
 		}
-		if (txtY.getText().toCharArray().length == 0) return;
+		if (txtY.getText().toCharArray().length == 0)
+			return;
 		for (char c : txtY.getText().toCharArray()) {
-			if (!Character.isDigit(c) && c != '.' && c != '-') return;
+			if (!Character.isDigit(c) && c != '.' && c != '-')
+				return;
 		}
-		if (txtZ.getText().toCharArray().length == 0) return;
+		if (txtZ.getText().toCharArray().length == 0)
+			return;
 		for (char c : txtZ.getText().toCharArray()) {
-			if (!Character.isDigit(c) && c != '.' && c != '-') return;
+			if (!Character.isDigit(c) && c != '.' && c != '-')
+				return;
 		}
 
 		if (lstView == null) {
@@ -673,7 +754,8 @@ public class Controller {
 			lstView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 			lstView.setContextMenu(creeContextMenu());
 
-			if (Main.DEBUG_MODE) System.out.println("Set ListView");
+			if (Main.DEBUG_MODE)
+				System.out.println("Set ListView");
 		}
 
 		Solide solide = Main.mapSolideNom.get(lstView.getSelectionModel().getSelectedItems().get(0));
@@ -707,6 +789,7 @@ public class Controller {
 			}
 		}
 
+		// FIXME Doesn't verify names
 		// Rename solide
 		// Enlève le solide de la liste
 		Main.listeNoms.remove(solideNom);
@@ -719,48 +802,125 @@ public class Controller {
 		// Update ListView
 		lstView.setItems(Main.listeNoms);
 
-		Main.update(Main.listeSolides, Color.WHITE);
+		Main.updateCollision();
 
 		// Close stage after each edit because selection is cleared
 		Stage stage = (Stage) btnClose.getScene().getWindow();
 		stage.close();
 
-		if (Main.DEBUG_MODE) System.out.println("x : " + Double.valueOf(txtX.getText()) * Math.PI / 180 + " rad");
-		if (Main.DEBUG_MODE) System.out.println("y : " + Double.valueOf(txtY.getText()) * Math.PI / 180 + " rad");
-		if (Main.DEBUG_MODE) System.out.println("z : " + Double.valueOf(txtZ.getText()) * Math.PI / 180 + " rad");
+		if (Main.DEBUG_MODE)
+			System.out.println("x : " + Double.valueOf(txtX.getText()) * Math.PI / 180 + " rad");
+		if (Main.DEBUG_MODE)
+			System.out.println("y : " + Double.valueOf(txtY.getText()) * Math.PI / 180 + " rad");
+		if (Main.DEBUG_MODE)
+			System.out.println("z : " + Double.valueOf(txtZ.getText()) * Math.PI / 180 + " rad");
 	}
 
 	/**
-	 * Termine le programme.
+	 * Modifie les parametres physiques du solide
+	 */
+	@SuppressWarnings("unchecked")
+	@FXML
+	protected void editSolideProperties() {
+		// Ne fait rien s'il y a des paramètres fautifs
+		if (txtLon.getText().toCharArray().length == 0)
+			return;
+		for (char c : txtLon.getText().toCharArray()) {
+			if (!Character.isDigit(c) && c != '.')
+				return;
+		}
+		if (txtX.getText().toCharArray().length == 0)
+			return;
+		for (char c : txtX.getText().toCharArray()) {
+			if (!Character.isDigit(c) && c != '.' && c != '-')
+				return;
+		}
+		if (txtY.getText().toCharArray().length == 0)
+			return;
+		for (char c : txtY.getText().toCharArray()) {
+			if (!Character.isDigit(c) && c != '.' && c != '-')
+				return;
+		}
+		if (txtZ.getText().toCharArray().length == 0)
+			return;
+		for (char c : txtZ.getText().toCharArray()) {
+			if (!Character.isDigit(c) && c != '.' && c != '-')
+				return;
+		}
+
+		if (lstView == null) {
+			lstView = (ListView<String>) ((VBox) Main.root.getRight()).getChildren().get(1);
+			lstView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+			lstView.setContextMenu(creeContextMenu());
+
+			if (Main.DEBUG_MODE)
+				System.out.println("Set ListView");
+		}
+
+		Solide solide = Main.mapSolideNom.get(lstView.getSelectionModel().getSelectedItems().get(0));
+
+		// Masse Solide
+		// Masse ne peut pas être nulle ou négative!
+		if (Double.valueOf(txtLon.getText()) <= 0) return;
+		solide.setMasse(Double.valueOf(txtLon.getText()));
+
+		// Vitesse Solide
+		solide.setVitesse(new Vector3d(Double.valueOf(txtX.getText()), Double.valueOf(txtY.getText()),
+				Double.valueOf(txtZ.getText())));
+
+		Main.updateCollision();
+
+		// Close stage after each edit because selection is cleared
+		Stage stage = (Stage) btnClose.getScene().getWindow();
+		stage.close();
+
+		if (Main.DEBUG_MODE)
+			System.out.println("x : " + Double.valueOf(txtX.getText()) * Math.PI / 180 + " rad");
+		if (Main.DEBUG_MODE)
+			System.out.println("y : " + Double.valueOf(txtY.getText()) * Math.PI / 180 + " rad");
+		if (Main.DEBUG_MODE)
+			System.out.println("z : " + Double.valueOf(txtZ.getText()) * Math.PI / 180 + " rad");
+	}
+
+	protected EventHandler<ActionEvent> loopEvent() {
+		return new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent arg0) {
+				if (Main.listeSolides.size() > 0) {
+					for (Solide solide : Main.listeSolides) {
+						solide.deplacementTime(Main.SECONDS_PER_UPDATE);
+					}
+
+					Main.updateCollision();
+				}
+			}
+		};
+	}
+	
+	/**
+	 * Contrôle la simulation.
 	 */
 	@FXML
 	protected void simulate() {
 		if (loop == null) {
-			loop = new Timeline(new KeyFrame(Duration.millis(75), new EventHandler<ActionEvent>() {
-
-				@Override
-				public void handle(ActionEvent arg0) {
-					if (Main.listeSolides.size() > 0) {
-						for (Solide solide : Main.listeSolides) {
-							solide.deplacementTime(Main.SECONDS_PER_UPDATE);
-						}
-
-						Main.updateCollision();
-					}
-				}
-			}));
+			loop = new Timeline(new KeyFrame(Duration.millis(75), loopEvent()));
 			loop.setCycleCount(Timeline.INDEFINITE);
 		}
 		if (Main.listeSolides.size() < 2) {
 			Alert alert = new Alert(AlertType.WARNING);
 			alert.setContentText("Il doit y avoir au moins deux corps pour démarrer la simulation.");
 			alert.show();
+			loop.pause();
 			return;
 		}
-		if (loop.getStatus().equals(Status.RUNNING)) loop.pause();
-		else loop.play();
+		if (loop.getStatus().equals(Status.RUNNING))
+			loop.pause();
+		else
+			loop.play();
 
-		if (Main.DEBUG_MODE) System.out.println("Timeline on? " + loop.getStatus().equals(Status.RUNNING));
+		if (Main.DEBUG_MODE)
+			System.out.println("Timeline on? " + loop.getStatus().equals(Status.RUNNING));
 	}
 
 	/**

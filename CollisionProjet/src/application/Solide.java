@@ -38,7 +38,7 @@ public class Solide {
 	private Vector3d vitesseAngulaire = new Vector3d();
 	private double masse;
 	private double momentInertie = 0;
-	private static double coefficientDeRestitution = 19 / 20;
+//	private static double coefficientDeRestitution = 19 / 20;
 
 	// Utilitaire
 	static Matrix3d rotation = new Matrix3d();
