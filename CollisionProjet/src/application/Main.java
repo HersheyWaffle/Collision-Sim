@@ -10,6 +10,8 @@ import javafx.util.Duration;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -32,21 +34,35 @@ import javax.vecmath.Matrix3d;
  */
 public class Main extends Application {
 
-	Vector3d rendering_centre = new Vector3d(0, 0, 0);// Origine de l'affichage
+	// origine
+	Vector3d renderingCentre = new Vector3d(0, 0, 0);// Origine de l'affichage
+	Vector3d renderingFocus = new Vector3d(0, 0, 0);// Origine changée
+	Point origine = new Point();
+
+	// variable utilitaire
 	int FONT_SIZE = 10; // taile des caractère
-	double dt = 1;
-	int i = 0;
-	boolean isPlaying = true;
-	Matrix3d util = new Matrix3d();
+	double dt = 0.05; // temps entre itération
+	int i = 0; // objet sélecter
+	boolean isPlaying = true; // si l'animation joue
 	
-	double ajust = 40 * (Solide.Z_CONST+Solide.distanceObservateur) / (Solide.Z_CONST );
+
+	// variable pour déplacer l'ensemble
+	Matrix3d util = new Matrix3d();
+	double ajust = 40 * (Solide.Z_CONST + Solide.distanceObservateur) / (Solide.Z_CONST);
 	Vector3d v1 = new Vector3d(ajust, 0, 0);
 	Vector3d v2 = new Vector3d(0, ajust, 0);
+
+	// position de l'origine
+	Vector3d positionCentre = new Vector3d();
+
+	//
+	ArrayList<Point> PointOpen = new ArrayList<Point>();
 
 	@Override
 	public void start(Stage primaryStage) {
 		try {
 
+			// javafx
 			Pane root = new Pane();
 			root.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
 			Scene scene = new Scene(root, 400, 400);
@@ -54,19 +70,36 @@ public class Main extends Application {
 			primaryStage.setScene(scene);
 			primaryStage.show();
 
-			rendering_centre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
+			// centre de focus
+			renderingCentre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
+			origine.setEclairage("@");
+			origine.setColor(Color.RED);
+
+			positionCentre.scale(-1, renderingFocus);
+			origine.setCoordonnee(positionCentre);
 
 			// declare les objets
-			Sphere s1 = new Sphere(50, 100, 50, FONT_SIZE, new Vector3d(10, 0, 0), new Vector3d(-300, 0, 0), 10);
-			Sphere s2 = new Sphere(50, 50, 50, FONT_SIZE, new Vector3d(-10, 0, 0), new Vector3d(300, 0, 0), 10);
+			Tore t1 = new Tore(50, 100, 100, 100, FONT_SIZE, new Vector3d(100, 0, 0), new Vector3d(-300, 50, 0), 10);
+			Tore t2 = new Tore(50, 100, 100, 100, FONT_SIZE, new Vector3d(0, 0, 0), new Vector3d(300, 0, 0), 10);
 			ArrayList<Solide> open = new ArrayList<Solide>();
-			open.add(s1);
-			open.add(s2);
+			open.add(t1);
+			open.add(t2);
 
-			// System.out.println(s1.momentInertie);
-			// System.out.println(s2.momentInertie);
+			// déclare les axes
+			Axe x = new Axe(new Vector3d(1, 0, 0), FONT_SIZE);
+			x.setColor(Color.BLUE);
+			Axe y = new Axe(new Vector3d(0, 1, 0), FONT_SIZE);
+			y.setColor(Color.GREEN);
+			Axe z = new Axe(new Vector3d(0, 0, 1), FONT_SIZE);
+			z.setColor(Color.RED);
+			ArrayList<Solide> axis = new ArrayList<Solide>();
+			axis.add(x);
+			axis.add(y);
+			axis.add(z);
+			
 
 			update(root, open);
+			update2(root, axis,true);
 
 			// joue l'animation
 			Timeline loop = new Timeline(new KeyFrame(Duration.millis(75), new EventHandler<ActionEvent>() {
@@ -78,6 +111,7 @@ public class Main extends Application {
 						}
 
 						update(root, open);
+						update2(root, axis,true);
 					}
 
 				}
@@ -87,13 +121,17 @@ public class Main extends Application {
 
 			// reajuse l'origine
 			scene.widthProperty().addListener((obs, oldVal, newVal) -> {
-				rendering_centre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
+				renderingCentre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
+
 				update(root, open);
+				update2(root, axis,true);
 			});
 
 			scene.heightProperty().addListener((obs, oldVal, newVal) -> {
-				rendering_centre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
+				renderingCentre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
+
 				update(root, open);
+				update2(root, axis,true);
 			});
 
 			root.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -101,13 +139,16 @@ public class Main extends Application {
 				@Override
 				public void handle(KeyEvent arg0) {
 					double posNeg = arg0.isShiftDown() ? -2 * Math.PI / 50 : 2 * Math.PI / 50;
-					
+
 					// changement de selecteur
 					if (arg0.getCode() == KeyCode.K) {
 						i = (i + 1) % open.size();
 					} // rotation de l'ensemble
 					else if (arg0.getCode() == KeyCode.DIGIT1) {
 						for (Solide s : open) {
+							s.rotateOrigine(posNeg, 0, 0);
+						}
+						for (Solide s : axis) {
 							s.rotateOrigine(posNeg, 0, 0);
 						}
 						util.rotX(posNeg);
@@ -118,12 +159,18 @@ public class Main extends Application {
 						for (Solide s : open) {
 							s.rotateOrigine(0, posNeg, 0);
 						}
+						for (Solide s : axis) {
+							s.rotateOrigine(0, posNeg, 0);
+						}
 						util.rotY(posNeg);
 						util.transform(v1);
 						util.transform(v2);
 
 					} else if (arg0.getCode() == KeyCode.DIGIT3) {
 						for (Solide s : open) {
+							s.rotateOrigine(0, 0, posNeg);
+						}
+						for (Solide s : axis) {
 							s.rotateOrigine(0, 0, posNeg);
 						}
 						util.rotZ(posNeg);
@@ -134,11 +181,18 @@ public class Main extends Application {
 					else if (arg0.getCode() == KeyCode.DIGIT4) {
 						for (Solide s : open) {
 							s.deplacement(v1);
-							
+						}
+						for (Solide s : axis) {
+							s.deplacement(v1);
 						}
 
 					} else if (arg0.getCode() == KeyCode.DIGIT5) {
 						for (Solide s : open) {
+							v1.scale(-1);
+							s.deplacement(v1);
+							v1.scale(-1);
+						}
+						for (Solide s : axis) {
 							v1.scale(-1);
 							s.deplacement(v1);
 							v1.scale(-1);
@@ -148,9 +202,18 @@ public class Main extends Application {
 						for (Solide s : open) {
 							s.deplacement(v2);
 						}
+						for (Solide s : axis) {
+							s.deplacement(v2);
+						}
+						
 
 					} else if (arg0.getCode() == KeyCode.DIGIT7) {
 						for (Solide s : open) {
+							v2.scale(-1);
+							s.deplacement(v2);
+							v2.scale(-1);
+						}
+						for (Solide s : axis) {
 							v2.scale(-1);
 							s.deplacement(v2);
 							v2.scale(-1);
@@ -208,6 +271,7 @@ public class Main extends Application {
 
 					}
 					update(root, open);
+					update2(root, axis,true);
 
 				}
 
@@ -216,10 +280,49 @@ public class Main extends Application {
 			// eloigne les objets de nous
 			root.setOnScroll((ScrollEvent event) -> {
 
-				double z = event.getDeltaY();
+				double depth = event.getDeltaY();
 
-				Solide.distanceObservateur += z;
+				Solide.distanceObservateur += depth;
 				update(root, open);
+				update2(root, axis,true);
+			});
+
+			root.setOnMouseClicked((MouseEvent event) -> {
+				// restore le virtual centre original
+				for (Solide s : open) {
+					s.virtualCentre.add(renderingFocus);
+				}
+				for (Solide s : axis) {
+					s.virtualCentre.add(renderingFocus);
+				}
+
+				// change le focus
+				if (event.getButton() == MouseButton.PRIMARY) {
+					Vector3d previousFocus = (Vector3d) renderingFocus.clone();
+					renderingFocus.x = event.getSceneX();
+					renderingFocus.y = event.getSceneY();
+					//renderingFocus.z = Solide.distanceObservateur;
+					renderingFocus.sub(renderingCentre);
+					renderingFocus.add(previousFocus);
+
+				} else if (event.getButton() == MouseButton.SECONDARY) {
+					renderingFocus = new Vector3d();
+				}
+
+				// change le virtual centre en fonction du nouveau focus
+				for (Solide s : open) {
+					s.virtualCentre.sub(renderingFocus);
+				}
+				for (Solide s : axis) {
+					s.virtualCentre.sub(renderingFocus);
+				}
+				// ajuste l'origine
+
+				positionCentre.scale(-1, renderingFocus);
+				origine.setCoordonnee(positionCentre);
+				update(root, open);
+				update2(root, axis,true);
+
 			});
 
 			root.requestFocus();
@@ -230,42 +333,31 @@ public class Main extends Application {
 
 	}
 
-	public void update(Pane root, Solide... solides) {
-		root.getChildren().clear();
-		for (Solide s : solides) {
-			s.isColliding = false;
-			s.setWhite();
-			Lumiere.lumiere_Objet(s.solide);
-		}
-
-		for (int i = 0; i < solides.length - 1; i++) {
-			for (int j = i + 1; j < solides.length; j++) {
-				if (solides[i].detecteurDeProximite(solides[j], dt)) {
-					solides[i].detecteurDeCollision(solides[j], dt);
-
-				}
-			}
-		}
-
-		for (Solide s : solides) {
-			update(s, root);
-		}
-
-	}
-
 	public void update(Pane root, ArrayList<Solide> solides) {
 		root.getChildren().clear();
 		for (Solide s : solides) {
 			s.isColliding = false;
 			s.setWhite();
-			Lumiere.lumiere_Objet(s.solide);
+		}
+		update2(root,solides,false);
 
-			// enlève les objets trop loin
-			/*
-			 * if (s.virtualCentre.length() > 300) { solides.remove(s); }
-			 */
+	}
+	
+	public void update2(Pane root, ArrayList<Solide> solides,boolean b) {
+		
+		for (Solide s : solides) {
+			Lumiere.lumiere_Objet(s.solide);
+		}
+		
+		if(b) {
+			for (Solide s : solides) {
+				s.setCharacter(".");
+			}
 		}
 
+		solides.remove(null);
+
+		// collision
 		for (int i = 0; i < solides.size() - 1; i++) {
 			for (int j = i + 1; j < solides.size(); j++) {
 				if (solides.get(i).detecteurDeProximite(solides.get(j), dt)) {
@@ -275,14 +367,17 @@ public class Main extends Application {
 			}
 		}
 
+		
+
+		// affichage
 		for (Solide s : solides) {
+			s.render(FONT_SIZE);
 			update(s, root);
 		}
 
 	}
 
 	public void update(Solide s, Pane root) {
-		s.render(FONT_SIZE);
 
 		// Color c = s.isColliding?Color.RED:Color.WHITE;
 		for (Point p : s.renderedSolide) {
@@ -291,8 +386,8 @@ public class Main extends Application {
 			t.setFill(p.getColor());
 
 			t.setFont(Font.font(STYLESHEET_CASPIAN, FontWeight.BOLD, s.FONT_SIZE));
-			t.setLayoutX(p.getCoordonnee().x + rendering_centre.x);
-			t.setLayoutY(p.getCoordonnee().y + rendering_centre.y);
+			t.setLayoutX(p.getCoordonnee().x + renderingCentre.x);
+			t.setLayoutY(p.getCoordonnee().y + renderingCentre.y);
 
 			root.getChildren().add(t);
 		}

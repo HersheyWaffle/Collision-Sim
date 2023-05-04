@@ -23,11 +23,12 @@ public class Lumiere {
 	
 	static public void ombre_Objet(ArrayList<Point> objet) {
 		ArrayList<Vector3d> section = Solide.cercle(Math.PI/5, source, 1, Math.PI);
-		ArrayList<ArrayList<Point>> ensemble = Solide.quadrant(section, objet);
+		Solide.vBuffer(source, objet);
+		//ArrayList<ArrayList<Point>> ensemble = Solide.quadrant(section, objet);
 		
-		for(ArrayList<Point> quadrant : ensemble) {
+		/*for(ArrayList<Point> quadrant : ensemble) {
 			Solide.vBuffer(source, quadrant);
-		}
+		}*/
 		
 	}
 	

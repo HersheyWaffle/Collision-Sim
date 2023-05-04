@@ -14,7 +14,7 @@ import javax.vecmath.Matrix3d;
  * @author Omar Ghazaly, Abel-Jimmy Oyono-Montoki
  */
 public class Sphere extends Solide {
-	
+	//
 	private double rayon; // Rayon du cercle
 	private double dThetaCercle; // Angle en Rad entre chaque point dans le cercle
 	private double dThetaSphere; // Angle en Rad entre chaque cercle dans la sphere
@@ -34,7 +34,32 @@ public class Sphere extends Solide {
 	 * @param rayon- rayon de la sphere
 	 * @param nbrCercle - nombre de cercle
 	 * @param nbrPointParCercle - nombre de point par Cercle
-	 * @param FONT_SIZE - taille des caractères
+	 * @param FONT_SIZE - taille des caractï¿½res
+	 */
+	public Sphere(double rayon, double nbrCercle, double nbrPointParCercle, final int FONT_SIZE,Vector3d vitesse, Vector3d virtualCentre, double masse, double coefficientDeRestitution) {
+		super(vitesse, virtualCentre, masse, coefficientDeRestitution);
+		this.rayon = rayon;
+		rayonDeCollision = rayon+100;
+		
+		dThetaCercle = 2 * Math.PI / nbrPointParCercle;
+		dThetaSphere = 2 * Math.PI / nbrCercle;
+
+		cercle_Sphere(dThetaCercle, new Vector3d(0, 0, 1), rayon);
+		sphere();
+		quadrant();
+		clean();
+		render(FONT_SIZE);
+		
+		
+	}
+	
+	/**
+	 * constructeur
+	
+	 * @param rayon- rayon de la sphere
+	 * @param nbrCercle - nombre de cercle
+	 * @param nbrPointParCercle - nombre de point par Cercle
+	 * @param FONT_SIZE - taille des caractï¿½res
 	 */
 	public Sphere(double rayon, double nbrCercle, double nbrPointParCercle, final int FONT_SIZE,Vector3d vitesse, Vector3d virtualCentre, double masse) {
 		super(vitesse, virtualCentre, masse);
@@ -56,7 +81,7 @@ public class Sphere extends Solide {
 	public Sphere(double rayon, double nbrCercle, double nbrPointParCercle, final int FONT_SIZE) {
 		super();
 		this.rayon = rayon;
-		rayonDeCollision = rayon+100;
+		rayonDeCollision = rayon;
 		
 		dThetaCercle = 2 * Math.PI / nbrPointParCercle;
 		dThetaSphere = 2 * Math.PI / nbrCercle;
@@ -72,7 +97,7 @@ public class Sphere extends Solide {
 	
 
 	/**
-	 * Crée un cercle
+	 * Crï¿½e un cercle
 	 */
 
 	public void cercle_Sphere(double dThetaCercle, Vector3d v, double rayon) {
@@ -80,7 +105,6 @@ public class Sphere extends Solide {
 
 		for (Vector3d u1 : c) {
 			Vector3d u2 = (Vector3d) u1.clone();
-			u1.add(new Vector3d(100,0,0));
 			Point p = new Point(u1, u2);
 			cercle.add(p);
 
@@ -89,7 +113,7 @@ public class Sphere extends Solide {
 	}
 
 	/**
-	 * Crée une sphere
+	 * Crï¿½e une sphere
 	 */
 	public void sphere() {
 
@@ -106,10 +130,10 @@ public class Sphere extends Solide {
 			}
 
 			theta += dThetaSphere;
-		} while (theta < 2*Math.PI);
-		inertie(new Vector3d(1,0,0));
+		} while (theta < Math.PI);
+		inertie(new Vector3d(0,0,1));
 		
-		//applique de la lumière sur l'objet
+		//applique de la lumiï¿½re sur l'objet
 		Lumiere.lumiere_Objet(solide);
 
 	}

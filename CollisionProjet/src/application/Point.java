@@ -94,5 +94,13 @@ public class Point {
 		this.coordonnee = coordonnee;
 		this.norme = norme;
 	}
+	
+	public Point(Vector3d coordonnee) {	
+		this.coordonnee = coordonnee;
+	}
+	
+	public Point() {
+
+	}
 
 }

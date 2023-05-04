@@ -33,42 +33,41 @@ public class test {
 		u.cross(v, getPerpendicular(v));
 
 		System.out.println(getPerpendicular(v).toString() +"   " + u.toString() + "   "+ v.toString());*/
-		/*
+		
+		//test rotation matrice
 		Matrix3d rotation = new Matrix3d();
 		double phi1 =0;
 		double phi2 =0;
 		
-		Vector3d v = new Vector3d(20,12,41);
+		Vector3d v = new Vector3d(-60,0,0);
 		//System.out.println(v);
 		
 		
-		//angle entre y et z rot de y ‡ z
+		//angle entre y et z rot de y a z
 		phi1 = Math.atan2(v.y,v.z);
 		rotation.rotX( phi1);
 		rotation.transform(v);
 		//System.out.println(v);
 		
-		//angle entre z et x, rot de z ‡ x
+		//angle entre z et x, rot de z a x
 		phi2= Math.atan2(v.z,v.x);
 		rotation.rotY(phi2);
 		rotation.transform(v);
 		System.out.println(v);
 		
-		
+		rotation.rotX(30);
+		rotation.transform(v);
+		//System.out.println(v);
+		//ram√®ne le vecteur v √† sa position initial
 		rotation.rotY(-phi2);
 		rotation.transform(v);
-		
-		
-		
-		//System.out.println(v);
-		
-		
-		
+
 		rotation.rotX(-phi1);
 		rotation.transform(v);
 		System.out.println(v);
 		
-		
+		/*
+		//faire un cercle perpendiculaire √† un vecteur
 		double theta = 0;
 		double dThetaCercle = Math.PI/10;
 		double rayon = 2;
@@ -96,6 +95,7 @@ public class test {
 		System.out.println(cercle);
 		*/
 		
+		/* test multiplication matrice
 		Matrix3d dtheta = new Matrix3d();
 		Matrix3d m1 = new Matrix3d();
 		Matrix3d m2 = new Matrix3d();
@@ -105,7 +105,7 @@ public class test {
 		m2.rotY(Math.PI/3);
 		System.out.println(m2);
 		dtheta.mul(m1,m2);
-		System.out.println(dtheta);
+		System.out.println(dtheta);*/
 	    
 		
 		
