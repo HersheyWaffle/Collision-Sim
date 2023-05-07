@@ -368,7 +368,7 @@ public class Solide {
 			if (v.z > 0) {
 
 				if (resize) {
-					//approxime la position des points
+					// approxime la position des points
 					v.x *= (Z_CONST) / (v.z);
 					v.y *= (Z_CONST) / (v.z);
 
@@ -615,6 +615,7 @@ public class Solide {
 
 				}
 			}
+			
 
 		}
 
@@ -643,12 +644,14 @@ public class Solide {
 				norme2.add(p.getNorme());
 
 			}
+			
+			//System.out.println("bonjour");
 			coordonnee2.scale(1.0 / CollisionPoint2.size());
 			norme2.scale(1.0 / CollisionPoint2.size());
 			l2.setCoordonnee(coordonnee2);
 			l2.setNorme(norme2);
 
-			resolveCollision(solide2, dt, l1, l2);
+			resolveCollision2(solide2, dt, l1, l2);
 
 		}
 
@@ -681,16 +684,6 @@ public class Solide {
 		u2.scaleAdd((solide2.masse - this.masse) / (this.masse + solide2.masse), solide2.vitesse, new Vector3d());
 		vitesseFinale2.add(u1, u2);
 
-		// change les vitesses finales pour qu'ils ont l'air plus réalistique
-		
-		Vector3d direction = new Vector3d();
-		direction.sub(this.virtualCentre, solide2.virtualCentre);
-		direction.normalize();
-		/*
-		vitesseFinale1.scale(vitesseFinale1.length(), direction);
-		direction.scale(-1);
-		vitesseFinale2.scale(vitesseFinale2.length(), direction);*/
-
 		// calcul les forces subits par les objets
 		Vector3d force1 = new Vector3d();
 		Vector3d force2 = new Vector3d();
@@ -699,8 +692,19 @@ public class Solide {
 		force1.scale(this.masse / dt);
 		force2.sub(vitesseFinale2, solide2.vitesse);
 		force2.scale(solide2.masse / dt);
-		System.out.println(force1);
-		System.out.println(force2);
+		//System.out.println("force solide 1"+force1);
+		//System.out.println("force solide 2"+force2);
+
+		// change les vitesses finales pour qu'ils ont l'air plus réalistique
+		
+		Vector3d direction = new Vector3d();
+		direction.sub(this.virtualCentre, solide2.virtualCentre);
+		direction.normalize();
+		vitesseFinale1.scale(vitesseFinale1.length(), direction);
+		direction.scale(-1);
+		System.out.println();
+		direction.normalize();
+		vitesseFinale2.scale(vitesseFinale2.length(), direction);
 
 		// calcul la vitesse angulaire final des objets
 		Vector3d vitesseAngulaire1 = new Vector3d();
@@ -720,16 +724,15 @@ public class Solide {
 		solide2.vitesse = vitesseFinale2;
 		solide2.vitesseAngulaire = vitesseAngulaire2;
 
-		System.out.println("solide 1: " + vitesseAngulaire);
-		System.out.println("solide 2: " + solide2.vitesseAngulaire);
+		//System.out.println("vitesse angulaire solide 1: " + vitesseAngulaire);
+		//System.out.println("vitesse angulaire solide 2: " + solide2.vitesseAngulaire);
 
-		// resout la collision
-
-		direction.scale(10);
+		// resout la collision	
+		/*
+		direction.scale(-10);
 		this.deplacement(direction);
 		direction.scale(-1);
-		solide2.deplacement(direction);
-
+		solide2.deplacement(direction);*/
 	}
 
 	/**
@@ -741,7 +744,7 @@ public class Solide {
 	 * @param p2      point de collision du solide2
 	 */
 	public void resolveCollision2(Solide solide2, double dt, Point p1, Point p2) {
-		// collision elastique
+		// collision inelastique
 		// calcul les vitesses finales
 		Vector3d vitesseFinale1 = new Vector3d();
 		Vector3d vitesseFinale2 = new Vector3d();
@@ -768,7 +771,16 @@ public class Solide {
 		force2.sub(vitesseFinale2, solide2.vitesse);
 		force2.scale(solide2.masse / dt);
 
-		// calcul les forces subits par les objets
+		// change les vitesses finales pour qu'ils ont l'air plus réalistique
+		
+		/*Vector3d direction = new Vector3d();
+		direction.sub(this.virtualCentre, solide2.virtualCentre);
+		direction.normalize();
+		vitesseFinale1.scale(vitesseFinale1.length(), direction);
+		direction.scale(-1);
+		vitesseFinale2.scale(vitesseFinale2.length(), direction);*/
+
+		// calcul la vitesse angulaire des objets
 		Vector3d vitesseAngulaire1 = new Vector3d();
 		Vector3d vitesseAngulaire2 = new Vector3d();
 
@@ -787,9 +799,11 @@ public class Solide {
 		solide2.vitesseAngulaire = vitesseAngulaire2;
 
 		// resout la collision
-		// this.deplacement2(dt);
-		// solide2.deplacement2(dt);
-
+		/*
+		direction.scale(-10);
+		this.deplacement(direction);
+		direction.scale(-1);
+		solide2.deplacement(direction);*/
 	}
 
 	/**

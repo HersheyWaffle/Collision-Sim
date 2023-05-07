@@ -20,27 +20,21 @@ public class Sphere extends Solide {
 	private double dThetaSphere; // Angle en Rad entre chaque cercle dans la sphere
 
 	ArrayList<Point> cercle = new ArrayList<Point>(); // Liste des vecteurs 3D de chaque point dans le cercle
-	
-	
-
-	
-
-
-	
 
 	/**
-	 * constructeur
-	
-	 * @param rayon- rayon de la sphere
-	 * @param nbrCercle - nombre de cercle
-	 * @param nbrPointParCercle - nombre de point par Cercle
-	 * @param FONT_SIZE - taille des caract�res
+	 * 
+	 * @param rayon-  rayon de la sphere
+	 * @param vitesse - vitesse de l'objet
+	 * @param centre  - position de l'objet
+	 * @param masse  - masse de l'objet
+	 * @param masse  - coefficient de restitution de l'objet
 	 */
-	public Sphere(double rayon, double nbrCercle, double nbrPointParCercle, final int FONT_SIZE,Vector3d vitesse, Vector3d virtualCentre, double masse, double coefficientDeRestitution) {
+	public Sphere(double rayon, double nbrCercle, double nbrPointParCercle, final int FONT_SIZE, Vector3d vitesse,
+			Vector3d virtualCentre, double masse, double coefficientDeRestitution) {
 		super(vitesse, virtualCentre, masse, coefficientDeRestitution);
 		this.rayon = rayon;
-		rayonDeCollision = rayon+100;
-		
+		rayonDeCollision = rayon + 100;
+
 		dThetaCercle = 2 * Math.PI / nbrPointParCercle;
 		dThetaSphere = 2 * Math.PI / nbrCercle;
 
@@ -49,23 +43,23 @@ public class Sphere extends Solide {
 		quadrant();
 		clean();
 		render(FONT_SIZE);
-		
-		
+
 	}
-	
+
 	/**
 	 * constructeur
-	
-	 * @param rayon- rayon de la sphere
-	 * @param nbrCercle - nombre de cercle
+	 * 
+	 * @param rayon-            rayon de la sphere
+	 * @param nbrCercle         - nombre de cercle
 	 * @param nbrPointParCercle - nombre de point par Cercle
-	 * @param FONT_SIZE - taille des caract�res
+	 * @param FONT_SIZE         - taille des caract�res
 	 */
-	public Sphere(double rayon, double nbrCercle, double nbrPointParCercle, final int FONT_SIZE,Vector3d vitesse, Vector3d virtualCentre, double masse) {
+	public Sphere(double rayon, double nbrCercle, double nbrPointParCercle, final int FONT_SIZE, Vector3d vitesse,
+			Vector3d virtualCentre, double masse) {
 		super(vitesse, virtualCentre, masse);
 		this.rayon = rayon;
-		rayonDeCollision = rayon+100;
-		
+		rayonDeCollision = rayon + 100;
+
 		dThetaCercle = 2 * Math.PI / nbrPointParCercle;
 		dThetaSphere = 2 * Math.PI / nbrCercle;
 
@@ -74,15 +68,14 @@ public class Sphere extends Solide {
 		quadrant();
 		clean();
 		render(FONT_SIZE);
-		
-		
+
 	}
-	
+
 	public Sphere(double rayon, double nbrCercle, double nbrPointParCercle, final int FONT_SIZE) {
 		super();
 		this.rayon = rayon;
 		rayonDeCollision = rayon;
-		
+
 		dThetaCercle = 2 * Math.PI / nbrPointParCercle;
 		dThetaSphere = 2 * Math.PI / nbrCercle;
 
@@ -92,16 +85,13 @@ public class Sphere extends Solide {
 		clean();
 		render(FONT_SIZE);
 	}
-
-	
-	
 
 	/**
 	 * Cr�e un cercle
 	 */
 
 	public void cercle_Sphere(double dThetaCercle, Vector3d v, double rayon) {
-		ArrayList<Vector3d> c = cercle(dThetaCercle, v, rayon, 2* Math.PI);
+		ArrayList<Vector3d> c = cercle(dThetaCercle, v, rayon, 2 * Math.PI);
 
 		for (Vector3d u1 : c) {
 			Vector3d u2 = (Vector3d) u1.clone();
@@ -131,20 +121,11 @@ public class Sphere extends Solide {
 
 			theta += dThetaSphere;
 		} while (theta < Math.PI);
-		inertie(new Vector3d(0,0,1));
-		
-		//applique de la lumi�re sur l'objet
+		inertie(new Vector3d(0, 0, 1));
+
+		// applique de la lumi�re sur l'objet
 		Lumiere.lumiere_Objet(solide);
 
 	}
-
-	
-	
-	
-
-	
-	
-	
-
 
 }

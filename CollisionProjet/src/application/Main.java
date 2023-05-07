@@ -18,6 +18,7 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -79,11 +80,16 @@ public class Main extends Application {
 			origine.setCoordonnee(positionCentre);
 
 			// declare les objets
-			Tore t1 = new Tore(50, 100, 100, 100, FONT_SIZE, new Vector3d(100, 0, 0), new Vector3d(-300, 50, 0), 10);
-			Tore t2 = new Tore(50, 100, 100, 100, FONT_SIZE, new Vector3d(0, 0, 0), new Vector3d(300, 0, 0), 10);
+			//Tore t1 = new Tore(50, 100, 100, 100, FONT_SIZE, new Vector3d(0, 0, 0), new Vector3d(0, 0, 0), 1000, 0);
+			Tore t1 = new Tore(50, 100, 100, 100, FONT_SIZE, new Vector3d(100, 0, 0), new Vector3d(-300, 0, 0), 10, 0.5);
+			Tore t2 = new Tore(50, 100, 100, 100, FONT_SIZE, new Vector3d(0, 0, 0), new Vector3d(300, -25, 0), 10, 0.5);
+			Tore t3 = new Tore(25, 0, 100, 100, FONT_SIZE, new Vector3d(0, 0, 0), new Vector3d(0, -25, 0), 5, 0.8);
+			Tore t4 = new Tore(25, 0, 100, 100, FONT_SIZE, new Vector3d(0, 0, 0), new Vector3d(600, 0, 0), 10, 0.7);
 			ArrayList<Solide> open = new ArrayList<Solide>();
 			open.add(t1);
 			open.add(t2);
+			open.add(t3);
+			open.add(t4);
 
 			// déclare les axes
 			Axe x = new Axe(new Vector3d(1, 0, 0), FONT_SIZE);
@@ -107,6 +113,7 @@ public class Main extends Application {
 					if (open.size() != 0) {
 						for (Solide s : open) {
 							s.deplacement2(dt);
+							
 
 						}
 
@@ -362,6 +369,7 @@ public class Main extends Application {
 			for (int j = i + 1; j < solides.size(); j++) {
 				if (solides.get(i).detecteurDeProximite(solides.get(j), dt)) {
 					solides.get(i).detecteurDeCollision(solides.get(j), dt);
+					
 
 				}
 			}
@@ -381,11 +389,15 @@ public class Main extends Application {
 
 		// Color c = s.isColliding?Color.RED:Color.WHITE;
 		for (Point p : s.renderedSolide) {
+		//for (Point p : s.solide) {
 
 			Text t = new Text(p.getEclairage());
+			//Rectangle t = new Rectangle(s.FONT_SIZE,s.FONT_SIZE);
+			//Text t = new Text(".");
 			t.setFill(p.getColor());
 
 			t.setFont(Font.font(STYLESHEET_CASPIAN, FontWeight.BOLD, s.FONT_SIZE));
+			
 			t.setLayoutX(p.getCoordonnee().x + renderingCentre.x);
 			t.setLayoutY(p.getCoordonnee().y + renderingCentre.y);
 
