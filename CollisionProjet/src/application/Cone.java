@@ -7,14 +7,14 @@ import javax.vecmath.Vector3d;
 /**
  * Objet Conique.
  * 
- * @version 1.0.0 2023-02-14
- * @author Omar Ghazaly, Abel-Jimmy Oyono-Montoki
+ * @version 1.1.1 2023-05-04
+ * @author Omar Ghazaly
  */
 public class Cone extends Solide {
 
 //=========================VARIABLES=========================
 
-	final double ESPACE_ENTRE_POINTS = 8;
+	final double ESPACE_ENTRE_POINTS = 5;
 
 	private double rayon; // Rayon du cercle
 	private double hauteur; // Hateur du cylindre
@@ -88,11 +88,11 @@ public class Cone extends Solide {
 			Vector3d temp = new Vector3d(0, 0, 0);
 
 			Vector3d u = new Vector3d(0, 0, y);
-			temp = getPerpendicular(u); // SUS C'est ça la norme?
+			temp = getPerpendicular(u);
 			triangle.add(new Point(u, temp));
 
 			Vector3d v = new Vector3d(0, z, y);
-			temp = getPerpendicular(v); // SUS C'est ça la norme?
+			temp = getPerpendicular(v);
 			triangle.add(new Point(v, temp));
 		}
 	}

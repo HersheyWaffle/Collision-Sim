@@ -7,14 +7,14 @@ import javax.vecmath.Vector3d;
 /**
  * Objet Cylindrique.
  * 
- * @version 1.1.0 2023-02-14
- * @author Omar Ghazaly, Abel-Jimmy Oyono-Montoki
+ * @version 1.1.1 2023-05-04
+ * @author Omar Ghazaly
  */
 public class Cylindre extends Solide {
 
 //=========================VARIABLES=========================
 
-	final double ESPACE_ENTRE_POINTS = 8;
+	final double ESPACE_ENTRE_POINTS = 5;
 
 	private double rayon; // Rayon du cercle
 	private double hauteur; // Hateur du cylindre
@@ -31,7 +31,7 @@ public class Cylindre extends Solide {
 	 * 
 	 * @param rayon    - Le rayon du cylindre.
 	 * @param hauteur  - La hauteur du cylindre.
-	 * @param fontSize - taille des caract�res
+	 * @param fontSize - taille des caractères
 	 */
 	public Cylindre(double rayon, double hauteur, final int fontSize) {
 		super.setFontSize(fontSize);
@@ -87,7 +87,7 @@ public class Cylindre extends Solide {
 				if (y >= hauteur || y <= -hauteur || z >= rayon || z <= -rayon) {
 					Vector3d temp = new Vector3d(0, 0, 0);
 					Vector3d u = new Vector3d(0, y, z);
-					temp = getPerpendicular(u); // SUS C'est ça la norme?
+					temp = getPerpendicular(u);
 					carre.add(new Point(u, temp));
 				}
 			}

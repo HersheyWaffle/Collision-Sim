@@ -18,8 +18,8 @@ public class Point {
 
 	private Vector3d coordonnee; // Vector3D des coordonnées du point
 	private Vector3d norme; // Vector3D de la norme du point
-	private Vector3d shadow; // Vector3D résultant de l'ombre projet�e par un point
-	private String eclairage; // Caractère représentant le niveau de luminosit� d'un point ".,-~:;=!*#$@"
+	private Vector3d shadow; // Vector3D résultant de l'ombre projetée par un point
+	private String eclairage; // Caractère représentant le niveau de luminosité d'un point ".,-~:;=!*#$@"
 	private String quadrant; // String représentant la région dans laquelle se trouve le point. Définit par
 								// une séquence de 0 et de 1, représentant les coordonnées du quadrant
 	private boolean isRendered; // Détermine si le point sera rendered sur l'écran
@@ -44,6 +44,34 @@ public class Point {
 		norme.normalize();
 		this.coordonnee = coordonnee;
 		this.norme = norme;
+	}
+
+	/**
+	 * Objet Point.
+	 * 
+	 * @param coordonnee - Le Vector3D des coordonnées du point.
+	 */
+	public Point(Vector3d coordonnee) {
+		this.coordonnee = new Vector3d(); // Initialisation des variables pour qu'elles ne lancent pas un
+											// NullPointerException
+		this.norme = new Vector3d();
+		shadow = new Vector3d();
+		quadrant = new String();
+		isRendered = true;
+
+		this.coordonnee = coordonnee;
+	}
+
+	/**
+	 * Objet Point.
+	 */
+	public Point() {
+		this.coordonnee = new Vector3d(); // Initialisation des variables pour qu'elles ne lancent pas un
+											// NullPointerException
+		this.norme = new Vector3d();
+		shadow = new Vector3d();
+		quadrant = new String();
+		isRendered = true;
 	}
 
 //=========================METHODES=========================	
@@ -122,7 +150,7 @@ public class Point {
 	public void setEclairage(String eclairage) {
 		this.eclairage = eclairage;
 	}
-	
+
 	/**
 	 * Retourne la couleur du point.
 	 * 
@@ -131,7 +159,7 @@ public class Point {
 	public Color getColor() {
 		return color;
 	}
-	
+
 	/**
 	 * Définit la couleur du point.
 	 * 

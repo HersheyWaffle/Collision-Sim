@@ -8,7 +8,7 @@ import javax.vecmath.Matrix3d;
 /**
  * Objet Spherique.
  * 
- * @version 1.0.2 2023-02-14
+ * @version 1.1.1 2023-05-04
  * @author Omar Ghazaly, Abel-Jimmy Oyono-Montoki
  */
 public class Sphere extends Solide {
@@ -41,7 +41,7 @@ public class Sphere extends Solide {
 		this.rayon = rayon;
 		this.decalage = decalage;
 
-		rayonDeCollision = rayon + 100;
+		rayonDeCollision = rayon;
 		dThetaCercle = 2 * Math.PI / (rayon / ESPACE_ENTRE_POINTS);
 
 		virtualCentre = new Vector3d(0, 0, 0);

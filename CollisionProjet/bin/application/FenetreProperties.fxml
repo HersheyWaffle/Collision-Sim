@@ -35,7 +35,12 @@
                         <Font name="Arial" size="12.0" />
                      </font>
                   </TextField>
-                  <TextField fx:id="txtLar" alignment="CENTER" promptText="0.00" style="-fx-background-color: grey; -fx-border-color: white;" text="0.00" visible="false">
+                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Coéfficient de restitution">
+                     <font>
+                        <Font name="Arial" size="24.0" />
+                     </font>
+                  </Text>
+                  <TextField fx:id="txtLar" alignment="CENTER" promptText="0.00" style="-fx-background-color: grey; -fx-border-color: white;" text="0.00">
                      <font>
                         <Font name="Arial" size="12.0" />
                      </font>

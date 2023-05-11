@@ -19,17 +19,6 @@ public class Lumiere {
 	
 //=========================METHODES=========================	
 	
-	/*
-	public Lumiere(Vector3d source) {
-		source.normalize();
-		this.source = source;
-	}
-	
-	public Lumiere() {
-		Vector3d source = new Vector3d(0,0,1);
-	}
-	*/
-
 	/**
 	 * Détermine si les points du solide sont ombragés à l'aide du z-buffer.
 	 * 
@@ -37,12 +26,7 @@ public class Lumiere {
 	 *              calcul
 	 */
 	public static void ombreObjet(ArrayList<Point> objet) {
-		ArrayList<Vector3d> section = Solide.cerclePerpendiculaire(Math.PI / 5, source, 1, Math.PI);
-		ArrayList<ArrayList<Point>> ensemble = Solide.quadrant(section, objet);
-
-		for (ArrayList<Point> quadrant : ensemble) {
-			Solide.vBuffer(source, quadrant);
-		}
+		Solide.vBuffer(source, objet);
 	}
 
 	/**

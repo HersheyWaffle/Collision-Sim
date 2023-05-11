@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import javax.vecmath.Vector3d;
+import javax.vecmath.Matrix3d;
 
 import javafx.animation.Animation.Status;
 import javafx.animation.KeyFrame;
@@ -24,11 +25,13 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
@@ -44,7 +47,7 @@ import javafx.util.Duration;
 /**
  * Classe utilitaire qui gère les controlles de l'interface d'utilisation.
  * 
- * @version 1.7.0 2023-05-02
+ * @version 1.7.2 2023-05-11
  * @author Omar Ghazaly
  */
 public class Controller {
@@ -56,6 +59,8 @@ public class Controller {
 
 	private Stage stage = new Stage();
 	private ListView<String> lstView;
+
+	private Matrix3d util = new Matrix3d();
 
 	private MenuItem ctxtMenuItemEdit = new MenuItem("Éditer");
 	private MenuItem ctxtMenuItemCombine = new MenuItem("Combiner");
@@ -90,6 +95,8 @@ public class Controller {
 	TextField titreHau;
 	@FXML
 	Button btnClose;
+	@FXML
+	CheckMenuItem checkBoxCollision;
 
 //=========================METHODES=========================
 
@@ -115,7 +122,7 @@ public class Controller {
 		}
 
 		lstView.setItems(Main.listeNoms);
-		
+
 		if (loop == null) {
 			loop = new Timeline(new KeyFrame(Duration.millis(75), loopEvent()));
 			loop.setCycleCount(Timeline.INDEFINITE);
@@ -132,7 +139,7 @@ public class Controller {
 	protected void afficheAPropos(ActionEvent arg0) {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		DialogPane panneauAPropos = alert.getDialogPane(); // panneau racine de la fenetre
-		panneauAPropos.setMinSize(500, 325);
+		panneauAPropos.setMinSize(500, 390);
 
 		VBox panneauTitresEtTextes = new VBox(); // panneau de textes
 		panneauTitresEtTextes.setPadding(new Insets(10));
@@ -141,16 +148,16 @@ public class Controller {
 		txtTitre.setFont(Font.font("Arial", FontWeight.BOLD, 20));
 		VBox.setMargin(txtTitre, new Insets(0, 0, 5, 0));
 
-		Text txtAbout = new Text("Version: 0.4.0" + "\nAuteurs: Omar Ghazaly et Abel-Jimmy Oyono-Montoki");
+		Text txtAbout = new Text("Version: 1.1.2" + "\nAuteurs: Omar Ghazaly et Abel-Jimmy Oyono-Montoki");
 		txtAbout.setFont(Font.font("Arial", 14));
 		VBox.setMargin(txtAbout, new Insets(0, 0, 10, 0));
 
-		Text txtTitreInstructions = new Text("Comment Utiliser"); // titre de la section calcul du score
+		Text txtTitreInstructions = new Text("Comment Utiliser");
 		txtTitreInstructions.setFont(Font.font("Arial", FontWeight.BOLD, 20));
 		VBox.setMargin(txtTitreInstructions, new Insets(20, 0, 5, 0));
 
 		Text txtInstructions = new Text("Naviguer la barre de menu et ajouter des objets à la scène."
-				+ "\nModifier et combiner les objets, puis simuler avec le bouton SIMULATION.");
+				+ "\nModifier et combiner les objets, puis simuler avec le bouton SIMULER.");
 		txtInstructions.setFont(Font.font("Arial", 14));
 		VBox.setMargin(txtInstructions, new Insets(0, 0, 15, 0));
 
@@ -158,8 +165,14 @@ public class Controller {
 		txtTitreControles.setFont(Font.font("Arial", FontWeight.BOLD, 20));
 		VBox.setMargin(txtTitreControles, new Insets(20, 0, 5, 0));
 
-		Text txtControles = new Text("X, Y, C: Rotation de la scène. Peser Shift pour tourner dans le sens inverse."
-				+ "\nBoutons flèche: Déplacement de la scène." + "\nW, S: Déplacement de la scène en profondeur.");
+		Text txtControles = new Text(
+						  "X, Y, C: Rotation de la scène."
+						+ "\nBoutons flèche: Déplacement de la scène."
+						+ "\nW, S et molette de souris: Déplacement de la scène en profondeur."
+						+ "\nShift: Tourne dans le sens inverse de la direction choisie."
+						+ "\nControl: Fait seulement tourner ou déplacer les objets séléctionnés."
+						+ "\nClic gauche: Redéfinit un nouveau centre de la scène."
+						+ "\nClic droit: Réinitialise le centre à la position initiale.");
 		txtControles.setFont(Font.font("Arial", 14));
 		VBox.setMargin(txtControles, new Insets(0, 0, 15, 0));
 
@@ -279,9 +292,10 @@ public class Controller {
 			Main.listeNoms.add(txtNom.getText());
 			Main.mapSolideNom.put(txtNom.getText(), cube);
 			Main.update(Main.listeSolides, Color.WHITE);
-
-//			Solide.creeForme(cube.getCube(), pane, Double.valueOf(txtX.getText()) + 300,
-//					Double.valueOf(txtY.getText()) + 300, Double.valueOf(txtZ.getText()));
+			
+			// Close stage after each edit
+			Stage stage = (Stage) txtLon.getScene().getWindow();
+			stage.close();
 		} else if (txtTitreParam.getText().toLowerCase().contains("sphère")) {
 			Sphere sphere = new Sphere(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()),
 					Main.FONT_SIZE);
@@ -295,6 +309,10 @@ public class Controller {
 			Main.listeNoms.add(txtNom.getText());
 			Main.mapSolideNom.put(txtNom.getText(), sphere);
 			Main.update(Main.listeSolides, Color.WHITE);
+			
+			// Close stage after each edit
+			Stage stage = (Stage) txtLon.getScene().getWindow();
+			stage.close();
 		} else if (txtTitreParam.getText().toLowerCase().contains("cône")) {
 			Cone cone = new Cone(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()), Main.FONT_SIZE);
 
@@ -307,6 +325,10 @@ public class Controller {
 			Main.listeNoms.add(txtNom.getText());
 			Main.mapSolideNom.put(txtNom.getText(), cone);
 			Main.update(Main.listeSolides, Color.WHITE);
+			
+			// Close stage after each edit
+			Stage stage = (Stage) txtLon.getScene().getWindow();
+			stage.close();
 		} else if (txtTitreParam.getText().toLowerCase().contains("cylindre")) {
 			Cylindre cylindre = new Cylindre(Double.valueOf(txtLon.getText()), Double.valueOf(txtLar.getText()),
 					Main.FONT_SIZE);
@@ -320,12 +342,14 @@ public class Controller {
 			Main.listeNoms.add(txtNom.getText());
 			Main.mapSolideNom.put(txtNom.getText(), cylindre);
 			Main.update(Main.listeSolides, Color.WHITE);
+			
+			// Close stage after each edit
+			Stage stage = (Stage) txtLon.getScene().getWindow();
+			stage.close();
 		}
 
-		if (Main.DEBUG_MODE)
-			System.out.println(txtLon.getText() + " " + txtLar.getText() + " " + txtHau.getText());
-		if (Main.DEBUG_MODE)
-			System.out.println(Main.listeSolides.size());
+		if (Main.DEBUG_MODE) System.out.println(txtLon.getText() + " " + txtLar.getText() + " " + txtHau.getText());
+		if (Main.DEBUG_MODE) System.out.println(Main.listeSolides.size());
 	}
 
 	/**
@@ -351,6 +375,7 @@ public class Controller {
 					lstView.setContextMenu(creeContextMenu());
 				}
 
+				// Contrôle du Timeline de la simulation
 				if (arg0.getCode() == KeyCode.P) {
 					if (loop == null)
 						return;
@@ -360,26 +385,55 @@ public class Controller {
 						loop.play();
 				}
 
+				util.rotZ(posNeg);
+				// caméra
+				util.transform(Main.renderingFocus);
+
 				for (Solide tousSolides : Main.listeSolides) {
+					// Déplacement du centre de la caméra
+					if (Solide.distanceObservateur != 0) {
+						tousSolides.virtualCentre.add(Main.renderingFocus);
+
+						Vector3d previousFocus = (Vector3d) Main.renderingFocus.clone();
+
+						// coordonnée du clic
+						Main.renderingFocus = new Vector3d(0, 0, -Solide.distanceObservateur);
+						Solide.distanceObservateur = 0;
+
+						Main.renderingFocus.add(previousFocus);
+
+						tousSolides.virtualCentre.sub(Main.renderingFocus);
+					}
 					if (!arg0.isControlDown()) {
 						if (arg0.getCode() == KeyCode.X) {
+							util.rotX(posNeg);
+							// caméra
+							util.transform(Main.renderingFocus);
 							tousSolides.rotate(ROTATION_ANGLE * posNeg, 0, 0);
 							Main.update(Main.listeSolides, Color.WHITE);
-	
-							if (Main.DEBUG_MODE) System.out.println("x");
+
+							if (Main.DEBUG_MODE)
+								System.out.println("x");
 						} else if (arg0.getCode() == KeyCode.C) {
+							util.rotY(posNeg);
+							// caméra
+							util.transform(Main.renderingFocus);
 							tousSolides.rotate(0, ROTATION_ANGLE * posNeg, 0);
 							Main.update(Main.listeSolides, Color.WHITE);
-	
-							if (Main.DEBUG_MODE) System.out.println("y");
+
+							if (Main.DEBUG_MODE)
+								System.out.println("y");
 						} else if (arg0.getCode() == KeyCode.Z) {
+							util.rotZ(posNeg);
+							// caméra
+							util.transform(Main.renderingFocus);
 							tousSolides.rotate(0, 0, ROTATION_ANGLE * posNeg);
 							Main.update(Main.listeSolides, Color.WHITE);
-	
-							if (Main.DEBUG_MODE) System.out.println("z");
+
+							if (Main.DEBUG_MODE)
+								System.out.println("z");
 						}
 					}
-					
 
 					if (Main.DEBUG_MODE)
 						System.out.println("LstView indices " + lstView.getSelectionModel().getSelectedIndices());
@@ -391,66 +445,77 @@ public class Controller {
 						if (arg0.getCode() == KeyCode.X) {
 							tousSolides.rotateSelf(ROTATION_ANGLE * posNeg, 0, 0);
 							Main.update(Main.listeSolides, Color.WHITE);
-	
-							if (Main.DEBUG_MODE) System.out.println("x");
+
+							if (Main.DEBUG_MODE)
+								System.out.println("x");
 						} else if (arg0.getCode() == KeyCode.C) {
 							tousSolides.rotateSelf(0, ROTATION_ANGLE * posNeg, 0);
 							Main.update(Main.listeSolides, Color.WHITE);
-	
-							if (Main.DEBUG_MODE) System.out.println("y");
+
+							if (Main.DEBUG_MODE)
+								System.out.println("y");
 						} else if (arg0.getCode() == KeyCode.Z) {
 							tousSolides.rotateSelf(0, 0, ROTATION_ANGLE * posNeg);
 							Main.update(Main.listeSolides, Color.WHITE);
-	
-							if (Main.DEBUG_MODE) System.out.println("z");
+
+							if (Main.DEBUG_MODE)
+								System.out.println("z");
 						}
 					}
-					
+
 					if (arg0.getCode() == KeyCode.W) {
 						tousSolides.deplacement(new Vector3d(0, 0, DEPLACEMENT_CENTRE));
 						Main.update(Main.listeSolides, Color.WHITE);
 
 						if (Main.DEBUG_MODE)
-							System.out.println("w");
+							System.out.println("w" + tousSolides.virtualCentre);
+						if (Main.DEBUG_MODE)
+							System.out.println("rendersize" + tousSolides.renderedSolide.size());
 					} else if (arg0.getCode() == KeyCode.S) {
 						tousSolides.deplacement(new Vector3d(0, 0, -DEPLACEMENT_CENTRE));
 						Main.update(Main.listeSolides, Color.WHITE);
 
 						if (Main.DEBUG_MODE)
-							System.out.println("s");
+							System.out.println("s" + tousSolides.virtualCentre);
+						if (Main.DEBUG_MODE)
+							System.out.println("rendersize" + tousSolides.renderedSolide.size());
 					} else if (arg0.getCode() == KeyCode.UP) {
 						tousSolides.deplacement(new Vector3d(0, -DEPLACEMENT_CENTRE, 0));
 						Main.update(Main.listeSolides, Color.WHITE);
 
 						if (Main.DEBUG_MODE)
-							System.out.println("^");
+							System.out.println("^" + tousSolides.virtualCentre);
+						if (Main.DEBUG_MODE)
+							System.out.println("rendersize" + tousSolides.renderedSolide.size());
 					} else if (arg0.getCode() == KeyCode.DOWN) {
 						tousSolides.deplacement(new Vector3d(0, DEPLACEMENT_CENTRE, 0));
 						Main.update(Main.listeSolides, Color.WHITE);
 
 						if (Main.DEBUG_MODE)
-							System.out.println("v");
+							System.out.println("v" + tousSolides.virtualCentre);
+						if (Main.DEBUG_MODE)
+							System.out.println("rendersize" + tousSolides.renderedSolide.size());
 					} else if (arg0.getCode() == KeyCode.LEFT) {
 						tousSolides.deplacement(new Vector3d(-DEPLACEMENT_CENTRE, 0, 0));
 						Main.update(Main.listeSolides, Color.WHITE);
 
 						if (Main.DEBUG_MODE)
-							System.out.println("<");
+							System.out.println("<" + tousSolides.virtualCentre);
+						if (Main.DEBUG_MODE)
+							System.out.println("rendersize" + tousSolides.renderedSolide.size());
 					} else if (arg0.getCode() == KeyCode.RIGHT) {
 						tousSolides.deplacement(new Vector3d(DEPLACEMENT_CENTRE, 0, 0));
 						Main.update(Main.listeSolides, Color.WHITE);
 
 						if (Main.DEBUG_MODE)
-							System.out.println(">");
+							System.out.println(">" + tousSolides.virtualCentre);
+						if (Main.DEBUG_MODE)
+							System.out.println("rendersize" + tousSolides.renderedSolide.size());
 					} else {
 						break;
 					}
 				}
 			}
-
-			// LEGACY CODE
-//				pane.getChildren().removeAll(pane.getChildren());
-//				Solide.creeForme(tousPoints, pane, 0, 0, 0);
 		};
 	}
 
@@ -553,21 +618,19 @@ public class Controller {
 
 	protected ContextMenu creeContextMenu() {
 		ctxtMenuListObj.getItems().addAll(ctxtMenuItemEdit, ctxtMenuItemCombine, ctxtMenuItemProperties,
-				ctxtMenuItemDelete);
+				new SeparatorMenuItem(), ctxtMenuItemDelete);
 
 		ctxtMenuItemCombine.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
 				Solide tousSolides = new Solide();
 				String solideName = lstView.getSelectionModel().getSelectedItems().get(0);
-				int idxSize = 0;
 				int xTotal = 0;
 				int yTotal = 0;
 				int zTotal = 0;
-
+				double maxVal = 0;
 				ObservableList<Integer> selectedIndices = lstView.getSelectionModel().getSelectedIndices();
-				idxSize = selectedIndices.size();
-				if (idxSize < 2)
+				if (selectedIndices.size() < 2)
 					return;
 				for (int i = selectedIndices.size() - 1; i >= 0; i--) {
 					int selectedIndex = selectedIndices.get(i);
@@ -576,10 +639,18 @@ public class Controller {
 						System.out.println(s + " selected");
 
 					for (Point p : Main.mapSolideNom.get(s).getSolide()) {
-						p.getCoordonnee().sub(Main.mapSolideNom.get(s).virtualCentre);
+						p.getCoordonnee().add(Main.mapSolideNom.get(s).virtualCentre);
+						if (Math.abs(p.getCoordonnee().x) > maxVal)
+							maxVal = Math.abs(p.getCoordonnee().x);
+						if (Math.abs(p.getCoordonnee().y) > maxVal)
+							maxVal = Math.abs(p.getCoordonnee().y);
+						if (Math.abs(p.getCoordonnee().z) > maxVal)
+							maxVal = Math.abs(p.getCoordonnee().z);
 						tousSolides.getSolide().add(p);
 					}
 
+					if (Main.DEBUG_MODE)
+						System.out.println("Max Val : " + maxVal);
 					// tousSolides.getSolide().addAll(Main.mapSolideNom.get(s).getSolide());
 
 					xTotal -= Main.mapSolideNom.get(s).virtualCentre.x;
@@ -599,8 +670,14 @@ public class Controller {
 				// Enlève tous les caractères, car ils seront réinitialisés
 				((Pane) Main.root.getCenter()).getChildren().removeAll((Pane) Main.root.getCenter());
 
-				tousSolides.virtualCentre = new Vector3d(xTotal / idxSize, yTotal / idxSize, zTotal / idxSize);
+				xTotal = 0;
+				yTotal = 0;
+				zTotal = 0;
+
+				tousSolides.virtualCentre = new Vector3d(xTotal, yTotal, zTotal);
+				tousSolides.rayonDeCollision = maxVal;
 				Lumiere.lumiereObjet(tousSolides.getSolide());
+				tousSolides.inertie(new Vector3d(1, 0, 0));
 
 				Main.listeSolides.add(tousSolides);
 				Main.listeNoms.add(solideName);
@@ -780,8 +857,7 @@ public class Controller {
 
 		// Check si le nom du solide est valide
 		for (String s : Main.listeNoms) {
-			if (txtNom.getText().equals(s) && !lstView.getSelectionModel().getSelectedIndices().get(0)
-					.equals(Main.listeSolides.indexOf(solide))) {
+			if (txtNom.getText().equals(s) && !Main.mapSolideNom.get(s).equals(solide)) {
 				Alert alert = new Alert(AlertType.WARNING);
 				alert.setContentText("Le nom des solides doit être unique!");
 				alert.show();
@@ -789,7 +865,6 @@ public class Controller {
 			}
 		}
 
-		// FIXME Doesn't verify names
 		// Rename solide
 		// Enlève le solide de la liste
 		Main.listeNoms.remove(solideNom);
@@ -802,7 +877,7 @@ public class Controller {
 		// Update ListView
 		lstView.setItems(Main.listeNoms);
 
-		Main.updateCollision();
+		Main.updateCollision(Main.listeSolides);
 
 		// Close stage after each edit because selection is cleared
 		Stage stage = (Stage) btnClose.getScene().getWindow();
@@ -826,6 +901,12 @@ public class Controller {
 		if (txtLon.getText().toCharArray().length == 0)
 			return;
 		for (char c : txtLon.getText().toCharArray()) {
+			if (!Character.isDigit(c) && c != '.')
+				return;
+		}
+		if (txtLar.getText().toCharArray().length == 0)
+			return;
+		for (char c : txtLar.getText().toCharArray()) {
 			if (!Character.isDigit(c) && c != '.')
 				return;
 		}
@@ -861,14 +942,22 @@ public class Controller {
 
 		// Masse Solide
 		// Masse ne peut pas être nulle ou négative!
-		if (Double.valueOf(txtLon.getText()) <= 0) return;
+		if (Double.valueOf(txtLon.getText()) <= 0)
+			return;
 		solide.setMasse(Double.valueOf(txtLon.getText()));
 
-		// Vitesse Solide
-		solide.setVitesse(new Vector3d(Double.valueOf(txtX.getText()), Double.valueOf(txtY.getText()),
-				Double.valueOf(txtZ.getText())));
+		// Coéfficient de restitution du Solide
+		// Coéfficient ne peut pas être négatif ou plus grand que 1!
+		if (Double.valueOf(txtLar.getText()) < 0 || Double.valueOf(txtLar.getText()) > 1)
+			return;
+		solide.setCoefficientDeRestitution(Double.valueOf(txtLar.getText()));
 
-		Main.updateCollision();
+		// Vitesse Solide
+		solide.setVitesse(new Vector3d(Double.valueOf(txtX.getText()) / Main.SECONDS_PER_UPDATE,
+				Double.valueOf(txtY.getText()) / Main.SECONDS_PER_UPDATE,
+				Double.valueOf(txtZ.getText()) / Main.SECONDS_PER_UPDATE));
+
+		Main.updateCollision(Main.listeSolides);
 
 		// Close stage after each edit because selection is cleared
 		Stage stage = (Stage) btnClose.getScene().getWindow();
@@ -882,22 +971,25 @@ public class Controller {
 			System.out.println("z : " + Double.valueOf(txtZ.getText()) * Math.PI / 180 + " rad");
 	}
 
+	/**
+	 * Le Event Handler qui va gérérer le Timeline pour contrôler la simulation.
+	 * 
+	 * @return Retourne le KeyEvent de la rotation
+	 */
 	protected EventHandler<ActionEvent> loopEvent() {
 		return new EventHandler<ActionEvent>() {
-
 			@Override
 			public void handle(ActionEvent arg0) {
 				if (Main.listeSolides.size() > 0) {
 					for (Solide solide : Main.listeSolides) {
 						solide.deplacementTime(Main.SECONDS_PER_UPDATE);
 					}
-
-					Main.updateCollision();
+					Main.updateCollision(Main.listeSolides);
 				}
 			}
 		};
 	}
-	
+
 	/**
 	 * Contrôle la simulation.
 	 */
@@ -921,6 +1013,28 @@ public class Controller {
 
 		if (Main.DEBUG_MODE)
 			System.out.println("Timeline on? " + loop.getStatus().equals(Status.RUNNING));
+	}
+
+	/**
+	 * Contrôle le type de simulation.
+	 */
+	@FXML
+	protected void setCollisionType() {
+		Main.COLLISIONS_INELASTIQUES = checkBoxCollision.isSelected();
+
+		if (Main.DEBUG_MODE)
+			System.out.println("Collisions inélastiques? " + Main.COLLISIONS_INELASTIQUES);
+	}
+
+	/**
+	 * Contrôle si les Debug Print sont actifs.
+	 */
+	@FXML
+	protected void setDebug() {
+		Main.DEBUG_MODE = checkBoxCollision.isSelected();
+
+		if (Main.DEBUG_MODE)
+			System.out.println("Debug Mode? " + Main.DEBUG_MODE);
 	}
 
 	/**

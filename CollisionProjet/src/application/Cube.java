@@ -7,14 +7,14 @@ import javax.vecmath.Vector3d;
 /**
  * Objet Cubique.
  * 
- * @version 1.1.0 2023-02-08
- * @author Omar Ghazaly, Abel-Jimmy Oyono-Montoki
+ * @version 1.1.1 2023-05-04
+ * @author Omar Ghazaly
  */
 public class Cube extends Solide {
 
 //=========================VARIABLES=========================
 
-	final double ESPACE_ENTRE_POINTS = 15;
+	final double ESPACE_ENTRE_POINTS = 12;
 
 	private double nbrPointsLongueur; // nombre de points sur la longueur
 	private double nbrPointsLargeur; // nombre de points sur la largeur
@@ -31,7 +31,7 @@ public class Cube extends Solide {
 	 * @param longueur - La longueur du cube.
 	 * @param largeur  - La largeur du cube.
 	 * @param hauteur  - La hauteur du cube.
-	 * @param fontSize - taille des caract�res
+	 * @param fontSize - taille des caractères
 	 */
 	public Cube(double longueur, double largeur, double hauteur, int fontSize) {
 		super.setFontSize(fontSize);
@@ -43,7 +43,7 @@ public class Cube extends Solide {
 		setCube();
 		Solide.enleveDoublons(getCube());
 
-		Vector3d util = new Vector3d(longueur / 2, largeur / 2, hauteur / 2);
+		Vector3d util = new Vector3d(longueur, largeur, hauteur);
 		rayonDeCollision = util.length();
 
 		quadrant();

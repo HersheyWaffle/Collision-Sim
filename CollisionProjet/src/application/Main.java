@@ -13,6 +13,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -23,14 +25,26 @@ import javafx.scene.text.Text;
 /**
  * La clase main qui initialise le simulateur.
  * 
- * @version 1.0 2023-02-07
+ * @version 1.6 2023-05-11
  * @author Omar Ghazaly, Abel-Jimmy Oyono-Montoki
  */
 public class Main extends Application {
-	// Global Variables
-	public static final boolean DEBUG_MODE = true;
-	public static final int SECONDS_PER_UPDATE = 1;
 
+//=========================VARIABLES=========================		
+
+	// Global Variables
+	public static final double SECONDS_PER_UPDATE = 0.05;
+	public static boolean DEBUG_MODE = false;
+	public static boolean COLLISIONS_INELASTIQUES = false;
+
+	// Origine
+	public static Vector3d renderingCentre = new Vector3d(0, 0, 0);// Origine de l'affichage
+	public static Vector3d renderingFocus = new Vector3d(0, 0, 0);// Origine changée
+
+	// Utilitaires
+	static int FONT_SIZE = 10; // taile des caractères
+
+	// Traitement du ListView
 	public static BorderPane root;
 	/**
 	 * La ObservableList des solides dans la scène
@@ -47,8 +61,7 @@ public class Main extends Application {
 	 */
 	public static HashMap<String, Solide> mapSolideNom = new HashMap<String, Solide>();
 
-	public static Vector3d renderingCentre = new Vector3d(0, 0, 0);// Origine de l'affichage
-	static int FONT_SIZE = 10; // taile des caractères
+//=========================METHODES=========================
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -59,26 +72,28 @@ public class Main extends Application {
 			root = fxmlLoader.load();
 			Scene scene = new Scene(root);
 
+			// Centre de focus
 			renderingCentre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
 
 			// réajuse l'origine
 			scene.widthProperty().addListener((obs, oldVal, newVal) -> {
 				renderingCentre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
-				updateCollision();
+				updateCollision(Main.listeSolides);
 			});
 
 			scene.heightProperty().addListener((obs, oldVal, newVal) -> {
 				renderingCentre = new Vector3d(scene.getWidth() / 2, scene.getHeight() / 2, 0);
-				updateCollision();
+				updateCollision(Main.listeSolides);
 			});
 
 			root.setOnScroll((ScrollEvent event) -> {
-
 				double z = event.getDeltaY();
 
 				Solide.distanceObservateur += z;
-				updateCollision();
+				updateCollision(Main.listeSolides);
 			});
+
+			update(listeSolides, Color.WHITE);
 
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setTitle("Simulateur de collisions");
@@ -87,39 +102,77 @@ public class Main extends Application {
 
 			Controller controller = new Controller();
 
+			root.setOnMouseClicked((MouseEvent event) -> {
+				// restore le virtual centre original
+				for (Solide s : listeSolides) {
+					s.virtualCentre.add(renderingFocus);
+				}
+
+				// change le focus
+				if (event.getButton() == MouseButton.PRIMARY) {
+					Vector3d previousFocus = (Vector3d) renderingFocus.clone();
+
+					// coordonnée du clic
+					renderingFocus = new Vector3d(event.getSceneX() - scene.getWidth() / 2,
+							event.getSceneY() - scene.getHeight() / 2, -Solide.distanceObservateur);
+					Solide.distanceObservateur = 0;
+
+					renderingFocus.add(previousFocus);
+				} else if (event.getButton() == MouseButton.SECONDARY) {
+					if (!renderingFocus.equals(new Vector3d())) {
+						// Solide.distanceObservateur = -renderingFocus.z;
+						renderingFocus = new Vector3d();
+					} else {
+						Solide.distanceObservateur = -renderingFocus.z;
+						renderingFocus = new Vector3d();
+					}
+
+				}
+
+				// change le virtual centre en fonction du nouveau focus
+				for (Solide s : listeSolides) {
+					if (DEBUG_MODE)
+						System.out.println("centre de l'objet avant: " + s.virtualCentre);
+					s.virtualCentre.sub(renderingFocus);
+					if (DEBUG_MODE)
+						System.out.println("centre de l'objet après: " + s.virtualCentre);
+				}
+				// ajuste l'origine
+				updateCollision(listeSolides);
+			});
+
 			root.setOnKeyPressed(controller.rotationKey());
 			root.requestFocus();
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 
-	public static void updateCollision() {
+	/**
+	 * Réinitialise la collision des solides.
+	 * 
+	 * @param sList - La liste de solides. Puisque nous n'avons pas les axes, c'est
+	 *              toujours listeSolides.
+	 */
+	public static void updateCollision(ObservableList<Solide> sList) {
 		((Pane) root.getCenter()).getChildren().clear();
-		for (Solide s : Main.listeSolides) {
+		for (Solide s : sList) {
 			s.isColliding = false;
-			s.setWhite();
+			if (s.resize)
+				s.setWhite();
 			Lumiere.lumiereObjet(s.getSolide());
-
-			// enlève les objets trop loin
-			/*
-			 * if (s.virtualCentre.length() > 300) { solides.remove(s); }
-			 */
 		}
-
-		for (int i = 0; i < Main.listeSolides.size() - 1; i++) {
-			for (int j = i + 1; j < Main.listeSolides.size(); j++) {
-				if (Main.listeSolides.get(i).detecteurDeProximite(Main.listeSolides.get(j), SECONDS_PER_UPDATE)) {
-					Main.listeSolides.get(i).detecteurDeCollision(Main.listeSolides.get(j), SECONDS_PER_UPDATE);
-
+		for (int i = 0; i < sList.size() - 1; i++) {
+			for (int j = i + 1; j < sList.size(); j++) {
+				if (sList.get(i).detecteurDeProximite(sList.get(j), SECONDS_PER_UPDATE)) {
+					sList.get(i).detecteurDeCollision(sList.get(j), SECONDS_PER_UPDATE);
 				}
 			}
 		}
-		update(Main.listeSolides, Color.WHITE);
+		update(sList, Color.WHITE);
 	}
-	
+
 	/**
 	 * Affiche les caractères ASCII du solide sur la scène.
 	 * 
@@ -129,13 +182,20 @@ public class Main extends Application {
 	public static void update(ObservableList<Solide> sList, Color col) {
 		((Pane) root.getCenter()).getChildren().clear();
 
+		if (DEBUG_MODE)
+			System.out.println("Update sList " + sList);
+
 		for (Solide s : sList) {
+			if (DEBUG_MODE)
+				System.out.println(sList.indexOf(s) + " Prerender " + s.getRenderedSolide().size());
 			s.render(FONT_SIZE);
+			if (DEBUG_MODE)
+				System.out.println(sList.indexOf(s) + " Postrender " + s.getRenderedSolide().size());
 
 			for (Point p : s.renderedSolide) {
-
 				Text t = new Text(p.getEclairage());
-				t.setFill(col);
+				if (s.resize)
+					t.setFill(col);
 
 				t.setFont(Font.font(STYLESHEET_CASPIAN, FontWeight.BOLD, s.fontSize));
 				t.setLayoutX(p.getCoordonnee().x + renderingCentre.x);
@@ -162,9 +222,11 @@ public class Main extends Application {
 			boolean solideSelected = false;
 
 			for (Solide s2 : solide) {
-				if (s2.equals(s)) solideSelected = true;
+				if (s2.equals(s))
+					solideSelected = true;
 			}
-			if (solideSelected) continue;
+			if (solideSelected)
+				continue;
 
 			s.render(FONT_SIZE);
 
